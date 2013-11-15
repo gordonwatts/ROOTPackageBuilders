@@ -1,0 +1,70 @@
+nuget {
+    nuspec {
+        id = ROOT;
+        version = 5.34.09.0026;
+        title = ROOT;
+        authors = {CERN};
+        owners = {G. Watts};
+        licenseUrl: "http://root.cern.ch/drupal/content/license";
+        projectUrl: "http://root.cern.ch";
+        iconUrl: "http://root.cern.ch/drupal/sites/default/files/rootdrawing-logo.png";
+        requireLicenseAcceptance: false;
+        summary: The complete ROOT data analysis toolkit for C++;
+        description: Contains all libraries needed for the full set of ROOT utilities;
+        releaseNotes: "Release v5.34.09 of ROOT";
+        tags: data;
+    };
+
+    files {
+        etc += {
+            #add-all-files : Items.MyEtcFiles;
+            #destination : ${build_root}\etc;
+        };
+        fonts += {
+            #add-all-files : Items.MyFontsFiles;
+            #destination : ${build_root}\fonts;
+        };
+        icons += {
+            #add-all-files : Items.MyIconsFiles;
+            #destination : ${build_root}\icons;
+        };
+    
+        include: { "root\include\*"};
+        etc: { "root\etc\**\*" };
+        fonts: { "root\fonts\**\*" };
+        icons: { "root\icons\**\*" };
+        
+        [x86,dynamic] {
+            lib: { "root\lib\*.lib" };
+            bin: { "root\bin\*.dll" };
+        };
+                }
+    
+    props {
+        ForcedIncludes += "w32pragma.h";
+    }
+    
+    targets {
+        // Use the AferBuild to implement the copy
+        AfterBuild {
+            .Copy {
+                SourceFiles = "@(MyFontsFiles)";
+                DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')";
+                SkipUnchangedFiles = true;
+                UseHardlinksIfPossible = true;
+            };
+            .Copy {
+                SourceFiles = "@(MyIconsFiles)";
+                DestinationFiles = "@(MyIconsFiles->'$(TargetDir)..\icons\%(RecursiveDir)%(Filename)%(Extension)')";
+                SkipUnchangedFiles = true;
+                UseHardlinksIfPossible = true;
+            };
+            .Copy {
+                SourceFiles = "@(MyEtcFiles)";
+                DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')";
+                SkipUnchangedFiles = true;
+                UseHardlinksIfPossible = true;
+            };
+        };
+    }
+}

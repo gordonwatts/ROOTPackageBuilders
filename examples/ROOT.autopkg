@@ -48,9 +48,9 @@ nuget {
         // Use the AferBuild to implement the copy
         AfterBuild {
             .Copy {
-                SourceFiles = @"@(MyFontsFiles)"
-                DestinationFiles = @"@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')"
-                SkipUnchangedFiles = true
+                SourceFiles= "@(MyFontsFiles)"
+                DestinationFiles = @"@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')";
+                SkipUnchangedFiles = true;
                 UseHardlinksIfPossible = true;
             };
             .Copy {

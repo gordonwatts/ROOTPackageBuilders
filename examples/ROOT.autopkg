@@ -1,7 +1,7 @@
 nuget {
     nuspec {
         id = ROOT;
-        version = 5.34.09.0026;
+        version = 5.34.18.0001;
         title = ROOT;
         authors = {CERN};
         owners = {G. Watts};
@@ -11,7 +11,7 @@ nuget {
         requireLicenseAcceptance: false;
         summary: The complete ROOT data analysis toolkit for C++;
         description: Contains all libraries needed for the full set of ROOT utilities;
-        releaseNotes: "Release v5.34.09 of ROOT";
+        releaseNotes: "Release v5.34.18 of ROOT";
         tags: data;
     };
 
@@ -38,7 +38,7 @@ nuget {
             lib: { "root\lib\*.lib" };
             bin: { "root\bin\*.dll" };
         };
-                }
+    }
     
     props {
         ForcedIncludes += "w32pragma.h";
@@ -48,21 +48,21 @@ nuget {
         // Use the AferBuild to implement the copy
         AfterBuild {
             .Copy {
-                SourceFiles = "@(MyFontsFiles)";
-                DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')";
-                SkipUnchangedFiles = true;
+                SourceFiles = "@(MyFontsFiles)"
+                DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')"
+                SkipUnchangedFiles = true
                 UseHardlinksIfPossible = true;
             };
             .Copy {
-                SourceFiles = "@(MyIconsFiles)";
-                DestinationFiles = "@(MyIconsFiles->'$(TargetDir)..\icons\%(RecursiveDir)%(Filename)%(Extension)')";
-                SkipUnchangedFiles = true;
+                SourceFiles = "@(MyIconsFiles)"
+                DestinationFiles = "@(MyIconsFiles->'$(TargetDir)..\icons\%(RecursiveDir)%(Filename)%(Extension)')"
+                SkipUnchangedFiles = true
                 UseHardlinksIfPossible = true;
             };
             .Copy {
-                SourceFiles = "@(MyEtcFiles)";
-                DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')";
-                SkipUnchangedFiles = true;
+                SourceFiles = "@(MyEtcFiles)"
+                DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')"
+                SkipUnchangedFiles = true
                 UseHardlinksIfPossible = true;
             };
         };

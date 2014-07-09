@@ -1,7 +1,7 @@
 nuget {
     nuspec {
         id = ROOT;
-        version = 5.34.18.0001;
+        version = 5.34.18.1;
         title = ROOT;
         authors = {CERN};
         owners = {G. Watts};
@@ -48,8 +48,8 @@ nuget {
         // Use the AferBuild to implement the copy
         AfterBuild {
             .Copy {
-                SourceFiles = "@(MyFontsFiles)"
-                DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')"
+                SourceFiles = @"@(MyFontsFiles)"
+                DestinationFiles = @"@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')"
                 SkipUnchangedFiles = true
                 UseHardlinksIfPossible = true;
             };

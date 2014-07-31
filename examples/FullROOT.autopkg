@@ -1,3 +1,4 @@
+
 #defines {
 	root_version = 5.34.19,
 	root_version_name = 5_34_19,
@@ -78,6 +79,9 @@ nuget {
     
     props {
         ForcedIncludes += "w32pragma.h";
+		RuntimeLibrary = MultiThreadedDLL;
+		UndefinePreprocessorDefinitions += _DEBUG;
+		PreprocessorDefinitions += _WIN32,WIN32;
     }
     
     targets {

@@ -55,21 +55,21 @@ nuget {
             lib: { "${d_vc10_rel}\lib\*.lib" };
             bin: { "${d_vc10_rel}\bin\*.dll" };
 		}
-		[x86,dynamic,v100,debug]
-		{
-            lib: { "${d_vc10_deb}\lib\*.lib" };
-            bin: { "${d_vc10_deb}\bin\*.dll" };
-		}
+		//[x86,dynamic,v100,debug]
+		//{
+        //    lib: { "${d_vc10_deb}\lib\*.lib" };
+        //    bin: { "${d_vc10_deb}\bin\*.dll" };
+		//}
 		[x86,dynamic,v110,release]
 		{
             lib: { "${d_vc11_rel}\lib\*.lib" };
             bin: { "${d_vc11_rel}\bin\*.dll" };
 		}
-		[x86,dynamic,v110,debug]
-		{
-            lib: { "${d_vc11_deb}\lib\*.lib" };
-            bin: { "${d_vc11_deb}\bin\*.dll" };
-		}
+		//[x86,dynamic,v110,debug]
+		//{
+        //    lib: { "${d_vc11_deb}\lib\*.lib" };
+        //    bin: { "${d_vc11_deb}\bin\*.dll" };
+		//}
         
         //[x86,dynamic] {
         //    lib: { "root\lib\*.lib" };
@@ -85,26 +85,35 @@ nuget {
     }
     
     targets {
-        // Use the AferBuild to implement the copy
-        AfterBuild {
-            .Copy {
-                SourceFiles= "@(MyFontsFiles)";
-                DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')";
-                SkipUnchangedFiles = true;
-                UseHardlinksIfPossible = true;
-            };
-            .Copy {
-                SourceFiles = "@(MyIconsFiles)";
-                DestinationFiles = "@(MyIconsFiles->'$(TargetDir)..\icons\%(RecursiveDir)%(Filename)%(Extension)')";
-                SkipUnchangedFiles = true;
-                UseHardlinksIfPossible = true;
-            };
-            .Copy {
-                SourceFiles = "@(MyEtcFiles)";
-                DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')";
-                SkipUnchangedFiles = true;
-                UseHardlinksIfPossible = true;
-            };
-        };
+
+		[release] {
+			// Use the AferBuild to implement the copy
+			AfterBuild {
+				.Copy {
+					SourceFiles= "@(MyFontsFiles)";
+					DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyIconsFiles)";
+					DestinationFiles = "@(MyIconsFiles->'$(TargetDir)..\icons\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyEtcFiles)";
+					DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+			};
+		};
+
+		[debug] {
+			//AfterBuild {
+			//	.Message { Text = "ROOT is only built against MSVC C++ release libraries and cannot be used against a debug build.";}
+			//};
+		};
     }
 }

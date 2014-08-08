@@ -1,0 +1,108 @@
+
+#defines {
+	root_version = 5.34.19,
+	root_version_name = 5_34_19,
+	wrapper_version = 01.00.00,
+	d_ROOT = ../../ROOT/,
+
+	// Now things built from above.
+	d_stub_dir = ${d_ROOT}/root_v${root_version}.win32.,
+	d_common_files = ${d_stub_dir}vc11/root,
+	d_vc11_rel = ${d_stub_dir}vc11/root,
+	d_vc11_deb = ${d_stub_dir}vc11.debug/root,
+	d_vc10_rel = ${d_stub_dir}vc10/root,
+	d_vc10_deb = ${d_stub_dir}vc10.debug/root,	
+	d_common_source = ${d_ROOT}/root_v${root_version}.source/root,
+}
+
+nuget {
+    nuspec {
+        id = ROOT_DEBUG_${root_version_name};
+        version = ${wrapper_version};
+        title = ROOT Debug v${root_version};
+        authors = {CERN};
+        owners = {G. Watts};
+        licenseUrl: "http://root.cern.ch/drupal/content/license";
+        projectUrl: "http://root.cern.ch";
+        iconUrl: "http://root.cern.ch/drupal/sites/default/files/rootdrawing-logo.png";
+        requireLicenseAcceptance: false;
+        summary: The complete ROOT data analysis toolkit for C++;
+        description: Contains all libraries needed for the full set of ROOT utilities;
+        releaseNotes: "Release ${root_version} of ROOT";
+        tags: data;
+    };
+
+    files {
+        etc += {
+            #add-all-files : Items.MyEtcFiles;
+            #destination : ${build_root}\etc;
+        };
+        fonts += {
+            #add-all-files : Items.MyFontsFiles;
+            #destination : ${build_root}\fonts;
+        };
+        icons += {
+            #add-all-files : Items.MyIconsFiles;
+            #destination : ${build_root}\icons;
+        };
+    
+        include: { "${d_common_files}\include\**\*"};
+        etc: { "${d_common_files}\etc\**\*" };
+        fonts: { "${d_common_files}\fonts\**\*" };
+        icons: { "${d_common_files}\icons\**\*" };
+		source: { "${d_common_source}\**\*" };
+
+		[x86,dynamic,v100,release]
+		{
+            lib: { "${d_vc10_deb}\lib\*.lib" };
+            bin: { "${d_vc10_deb}\bin\*.dll" };
+			symbols: {"${d_vc10_deb}\bin\*.pdb" };
+		}
+		[x86,dynamic,v110,release]
+		{
+            lib: { "${d_vc11_deb}\lib\*.lib" };
+            bin: { "${d_vc11_deb}\bin\*.dll" };
+			symbols: {"${d_vc11_deb}\bin\*.pdb" };
+		};
+    }
+    
+    props {
+        ForcedIncludes += "w32pragma.h";
+		RuntimeLibrary = MultiThreadedDLL;
+		UndefinePreprocessorDefinitions += _DEBUG;
+		PreprocessorDefinitions += _WIN32,WIN32;
+    }
+    
+    targets {
+
+		[release] {
+			// Use the AferBuild to implement the copy
+			AfterBuild {
+				.Copy {
+					SourceFiles= "@(MyFontsFiles)";
+					DestinationFiles = "@(MyFontsFiles->'$(TargetDir)..\fonts\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyIconsFiles)";
+					DestinationFiles = "@(MyIconsFiles->'$(TargetDir)..\icons\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyEtcFiles)";
+					DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+			};
+		};
+
+		[debug] {
+			//AfterBuild {
+			//	.Message { Text = "ROOT is only built against MSVC C++ release libraries and cannot be used against a debug build.";}
+			//};
+		};
+    }
+}

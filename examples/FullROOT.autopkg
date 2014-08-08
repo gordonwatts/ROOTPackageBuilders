@@ -2,7 +2,7 @@
 #defines {
 	root_version = 5.34.19,
 	root_version_name = 5_34_19,
-	wrapper_version = 01.00.00,
+	wrapper_version = 01.00.01,
 	d_ROOT = ../../ROOT/,
 
 	// Now things built from above.
@@ -44,6 +44,10 @@ nuget {
             #add-all-files : Items.MyIconsFiles;
             #destination : ${build_root}\icons;
         };
+		lib_dist += {
+            #add-all-files : Items.MyLibFiles;
+            #destination : ${build_root}\lib_dist;
+		};
     
         include: { "${d_common_files}\include\**\*"};
         etc: { "${d_common_files}\etc\**\*" };
@@ -54,6 +58,7 @@ nuget {
 		{
             lib: { "${d_vc10_rel}\lib\*.lib" };
             bin: { "${d_vc10_rel}\bin\*.dll" };
+			lib_dist: {"${d_vc10_rel}\lib\*" };
 		}
 		//[x86,dynamic,v100,debug]
 		//{
@@ -64,6 +69,7 @@ nuget {
 		{
             lib: { "${d_vc11_rel}\lib\*.lib" };
             bin: { "${d_vc11_rel}\bin\*.dll" };
+			lib_dist: {"${d_vc11_rel}\lib\*" };
 		}
 		//[x86,dynamic,v110,debug]
 		//{
@@ -104,6 +110,12 @@ nuget {
 				.Copy {
 					SourceFiles = "@(MyEtcFiles)";
 					DestinationFiles = "@(MyEtcFiles->'$(TargetDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyLibFiles)";
+					DestinationFiles = "@(MyLibFiles->'$(TargetDir)..\lib\%(RecursiveDir)%(Filename)%(Extension)')";
 					SkipUnchangedFiles = true;
 					UseHardlinksIfPossible = true;
 				};

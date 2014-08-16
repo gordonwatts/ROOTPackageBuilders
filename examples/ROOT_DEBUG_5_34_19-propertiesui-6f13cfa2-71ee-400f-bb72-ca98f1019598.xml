@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework">
+  <Rule Name="ReferencedPackages96993cb8-c0b5-4173-8927-40d465069e4a" PageTemplate="tool" DisplayName="Referenced Packages" SwitchPrefix="/" Order="1">
+    <Rule.Categories>
+      <Category Name="ROOT_DEBUG_5_34_19" DisplayName="ROOT_DEBUG_5_34_19" />
+    </Rule.Categories>
+    <Rule.DataSource>
+      <DataSource Persistence="ProjectFile" ItemType="" />
+    </Rule.DataSource>
+    <EnumProperty Name="Linkages-ROOT_DEBUG_5_34_19" DisplayName="Linkages" Description="Which version of the .lib file to link to this library" Category="ROOT_DEBUG_5_34_19">
+      <EnumValue Name="" DisplayName="Dynamic Library (DLL)" />
+    </EnumProperty>
+  </Rule>
+</ProjectSchemaDefinitions>

@@ -26,7 +26,7 @@ nuget {
         iconUrl: "http://root.cern.ch/drupal/sites/default/files/rootdrawing-logo.png";
         requireLicenseAcceptance: false;
         summary: The complete ROOT data analysis toolkit for C++;
-        description: Contains all libraries needed for the full set of ROOT utilities;
+        description: Contains all libraries needed for the full set of ROOT utilities for a release build for vs 2010 and 2012 (debug build is not supported!);
         releaseNotes: "Release ${root_version} of ROOT";
         tags: data;
     };
@@ -48,8 +48,21 @@ nuget {
             #add-all-files : Items.MyLibFiles;
             #destination : ${build_root}\lib_dist;
 		};
+		bin_dist += {
+            #add-all-files : Items.MyBinFiles;
+            #destination : ${build_root}\bin_dist;
+		};
+		inc_dist += {
+            #add-all-files : Items.MyIncFiles;
+            #destination : ${build_root}\inc_dist;
+		};
+		cint_dist += {
+            #add-all-files : Items.MyCintFiles;
+            #destination : ${build_root}\cint_dist;
+		};
     
         include: { "${d_common_files}\include\**\*"};
+        inc_dist: { "${d_common_files}\include\**\*"};
         etc: { "${d_common_files}\etc\**\*" };
         fonts: { "${d_common_files}\fonts\**\*" };
         icons: { "${d_common_files}\icons\**\*" };
@@ -59,28 +72,17 @@ nuget {
             lib: { "${d_vc10_rel}\lib\*.lib" };
             bin: { "${d_vc10_rel}\bin\*.dll" };
 			lib_dist: {"${d_vc10_rel}\lib\*" };
+			bin_dist: {"${d_vc10_rel}\bin\*.exe" };
+			cint_dist: {"${d_vc10_rel}\cint\**\*" };
 		}
-		//[x86,dynamic,v100,debug]
-		//{
-        //    lib: { "${d_vc10_deb}\lib\*.lib" };
-        //    bin: { "${d_vc10_deb}\bin\*.dll" };
-		//}
 		[x86,dynamic,v110,release]
 		{
             lib: { "${d_vc11_rel}\lib\*.lib" };
             bin: { "${d_vc11_rel}\bin\*.dll" };
 			lib_dist: {"${d_vc11_rel}\lib\*" };
+			bin_dist: {"${d_vc11_rel}\bin\*.exe" };
+			cint_dist: {"${d_vc11_rel}\cint\**\*" };
 		}
-		//[x86,dynamic,v110,debug]
-		//{
-        //    lib: { "${d_vc11_deb}\lib\*.lib" };
-        //    bin: { "${d_vc11_deb}\bin\*.dll" };
-		//}
-        
-        //[x86,dynamic] {
-        //    lib: { "root\lib\*.lib" };
-        //    bin: { "root\bin\*.dll" };
-        //};
     }
     
     props {
@@ -119,12 +121,35 @@ nuget {
 					SkipUnchangedFiles = true;
 					UseHardlinksIfPossible = true;
 				};
+				.Copy {
+					SourceFiles = "@(MyBinFiles)";
+					DestinationFiles = "@(MyBinFiles->'$(TargetDir)..\bin\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyIncFiles)";
+					DestinationFiles = "@(MyIncFiles->'$(TargetDir)..\include\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyCintFiles)";
+					DestinationFiles = "@(MyCintFiles->'$(TargetDir)..\cint\cint\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
 			};
 		};
 
 		[debug] {
 			//AfterBuild {
 			//	.Message { Text = "ROOT is only built against MSVC C++ release libraries and cannot be used against a debug build.";}
+			//};
+		};
+		[v110] {
+			//AfterBuild {
+			//	.Message { Text = "ROOT is only built against MSVC C++ release libraries for 2010 and 2012 and cannot be used against a.";}
 			//};
 		};
     }

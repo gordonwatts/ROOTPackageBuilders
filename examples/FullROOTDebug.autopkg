@@ -49,8 +49,21 @@ nuget {
             #add-all-files : Items.MyLibFiles;
             #destination : ${build_root}\lib_dist;
 		};
-    
+		bin_dist += {
+            #add-all-files : Items.MyBinFiles;
+            #destination : ${build_root}\bin_dist;
+		};
+		inc_dist += {
+            #add-all-files : Items.MyIncFiles;
+            #destination : ${build_root}\inc_dist;
+		};
+		cint_dist += {
+            #add-all-files : Items.MyCintFiles;
+            #destination : ${build_root}\cint_dist;
+		};
+		
         include: { "${d_common_files}\include\**\*"};
+        inc_dist: { "${d_common_files}\include\**\*"};
         etc: { "${d_common_files}\etc\**\*" };
         fonts: { "${d_common_files}\fonts\**\*" };
         icons: { "${d_common_files}\icons\**\*" };
@@ -62,6 +75,8 @@ nuget {
             bin: { "${d_vc10_deb}\bin\*.dll" };
 			symbols: {"${d_vc10_deb}\bin\*.pdb" };
 			lib_dist: {"${d_vc10_deb}\lib\*" };
+			bin_dist: {"${d_vc10_deb}\bin\*.exe" };
+			cint_dist: {"${d_vc10_rel}\cint\**\*" };
 		}
 		[x86,dynamic,v110,release]
 		{
@@ -69,6 +84,8 @@ nuget {
             bin: { "${d_vc11_deb}\bin\*.dll" };
 			symbols: {"${d_vc11_deb}\bin\*.pdb" };
 			lib_dist: {"${d_vc11_deb}\lib\*" };
+			bin_dist: {"${d_vc11_deb}\bin\*" };
+			cint_dist: {"${d_vc11_rel}\cint\**\*" };
 		};
     }
     
@@ -105,6 +122,24 @@ nuget {
 				.Copy {
 					SourceFiles = "@(MyLibFiles)";
 					DestinationFiles = "@(MyLibFiles->'$(TargetDir)..\lib\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyBinFiles)";
+					DestinationFiles = "@(MyBinFiles->'$(TargetDir)..\bin\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyIncFiles)";
+					DestinationFiles = "@(MyIncFiles->'$(TargetDir)..\include\%(RecursiveDir)%(Filename)%(Extension)')";
+					SkipUnchangedFiles = true;
+					UseHardlinksIfPossible = true;
+				};
+				.Copy {
+					SourceFiles = "@(MyCintFiles)";
+					DestinationFiles = "@(MyCintFiles->'$(TargetDir)..\cint\cint\%(RecursiveDir)%(Filename)%(Extension)')";
 					SkipUnchangedFiles = true;
 					UseHardlinksIfPossible = true;
 				};

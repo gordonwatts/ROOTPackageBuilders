@@ -2,6 +2,7 @@
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -62,21 +63,90 @@ namespace ROOTMSBuildTasks
                 return true;
             }
 
-            // If we are here we are going to have to do the complete download. Log a message first.
-            Log.LogMessage(MessageImportance.High, string.Format("Downloading ROOT v{0}", Version));
-
             // Build the URL, and then download the file.
             string url = string.Format("ftp://root.cern.ch/root/root_v{0}.win32.{1}.tar.gz", Version, VCVersion);
             string filePath = Path.Combine(new string[] { InstallationPath, string.Format("root_v{0}.win32.{1}.tar.gz", Version, VCVersion) });
+            Log.LogMessage(MessageImportance.Low, "Downloading from URL {0} to location {1}", url, filePath);
 
             if (!File.Exists(filePath))
             {
+                // If we are here we are going to have to do the complete download. Log a message first.
+                Log.LogMessage(MessageImportance.High, string.Format("Downloading ROOT v{0}", Version));
+
+                // Create the directory
+                if (!Directory.Exists(InstallationPath))
+                {
+                    Directory.CreateDirectory(InstallationPath);
+                }
+
+                // Do the download
                 WebClient webClient = new WebClient();
                 webClient.DownloadFile(url, filePath);
             }
 
+            // Next, unpack the downloaded file.
             Log.LogMessage(MessageImportance.High, string.Format("Unpacking ROOT v{0}", Version));
 
+            // Make sure 7 zip is there.
+            string sevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+            if (!File.Exists(sevenZipPath))
+            {
+                Log.LogError("The 7zip utility to uncompress the ROOT archive must be installed");
+                return false;
+            }
+
+            // Unpack the gz
+            string uncompressCmdArgs = string.Format("x -y {0}", filePath);
+            if (!ExecuteCommandLine(sevenZipPath, uncompressCmdArgs))
+            {
+                return false;
+            }
+
+            // Unpack the resulting tar file
+            var tarFile = filePath.Replace(".tar.gz", ".tar");
+            uncompressCmdArgs = string.Format("x -y {0}", tarFile);
+            if (!ExecuteCommandLine(sevenZipPath, uncompressCmdArgs))
+            {
+                return false;
+            }
+
+            // It will be in a directory called "root". We need to rename that.
+            var rootInstallLocation = Path.Combine(InstallationPath, "root");
+            Directory.Move(rootInstallLocation, ROOTSYS);
+
+            // Remove the tar file, which can be quite large. We'll leave the gz around so that if something
+            // happens we don't have to re-download things.
+            File.Delete(tarFile);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Run a command.
+        /// </summary>
+        /// <param name="exePath"></param>
+        /// <param name="args"></param>
+        private bool ExecuteCommandLine(string exePath, string args)
+        {
+            Log.LogCommandLine(string.Format("{0} {1}", exePath, args));
+            var proc = new ProcessStartInfo(exePath, args);
+            proc.WorkingDirectory = InstallationPath;
+            proc.UseShellExecute = false;
+            proc.CreateNoWindow = true;
+            proc.RedirectStandardOutput = true;
+
+            // Start it up, and then relay all the output we can.
+            var pwait = Process.Start(proc);
+
+            Log.LogMessagesFromStream(pwait.StandardOutput, MessageImportance.Normal);
+
+            // Finish up and return.
+            pwait.WaitForExit();
+            if (pwait.ExitCode != 0)
+            {
+                Log.LogError(string.Format("7Zip failed with exit code {0}.", pwait.ExitCode));
+                return false;
+            }
             return true;
         }
     }

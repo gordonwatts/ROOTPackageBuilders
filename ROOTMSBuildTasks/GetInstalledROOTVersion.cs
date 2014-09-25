@@ -22,13 +22,23 @@ namespace ROOTMSBuildTasks
     ///   
     /// If either of these things fails, then the string "notfound" is returned. 
     /// </summary>
-    public class GetROOTVersion : Task
+    public class GetInstalledROOTVersion : Task
     {
         /// <summary>
         /// Returns the current version of ROOT installed on the machine.
         /// </summary>
+        /// <remarks>
+        /// Set to "nofound" if no version of ROOT was found.
+        /// </remarks>
         [Output]
         public string Version { get; private set; }
+
+        /// <summary>
+        /// The ROOTSYS that points to the installed ROOT we found. Only contains
+        /// something sensible if Version is set to soemthing other than "notfound".
+        /// </summary>
+        [Output]
+        public string ROOTSYS { get; private set; }
 
         /// <summary>
         /// Look for the ROOT install and the version number.
@@ -37,6 +47,7 @@ namespace ROOTMSBuildTasks
         public override bool Execute()
         {
             Version = "notfound";
+            ROOTSYS = "";
 
             // Try the ROOTSYS number first.
             var rootsys = Environment.GetEnvironmentVariable("ROOTSYS");
@@ -52,6 +63,7 @@ namespace ROOTMSBuildTasks
             if (v != null)
             {
                 Version = v;
+                ROOTSYS = rootsys;
                 return true;
             }
             return true;

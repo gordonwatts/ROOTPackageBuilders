@@ -85,7 +85,7 @@ namespace ROOTMSBuildTasks
                 return null;
             if (!vl[0].StartsWith("v"))
                 return null;
-            return vl[0].Substring(1);
+            return vl[0].Substring(1).Replace("-",".");
         }
 
         /// <summary>

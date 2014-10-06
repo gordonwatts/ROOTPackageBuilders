@@ -18,6 +18,7 @@
   </metadata>
   <files>
 	<file src="ROOT.targets" target="/build/native/ROOT.targets" />
+	<file src="ROOT.props" target="/build/native/ROOT.props" />
 	<file src="..\ROOTMSBuildTasks\bin\Release\ROOTMSBuildTasks.dll" target="/build/native/ROOTMSBuildTasks.dll" />
   </files>
 </package>

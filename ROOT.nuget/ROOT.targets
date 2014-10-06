@@ -20,7 +20,7 @@
   </DownloadAndUnpackROOT>
 </Target>
 <Target Name="WriteStartupFile" AfterTargets="DownloadAndUnpack">
-	<ItemGroup>
+  <ItemGroup>
 		<StartLines Include="@REM Use to start devenv" />
 		<StartLines Include="@set ROOTSYS=$(ROOTSYSPath)" />
 		<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />

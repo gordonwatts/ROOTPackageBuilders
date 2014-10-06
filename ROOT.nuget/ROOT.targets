@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<!-- The ROOT Build tasks -->
+<UsingTask TaskName="GetInstalledROOTVersion" AssemblyFile="ROOTMSBuildTasks.dll"/>
+<UsingTask TaskName="DownloadAndUnpackROOT" AssemblyFile="ROOTMSBuildTasks.dll" />
+
+<PropertyGroup>
+  <ROOTVersion>5.34.20</ROOTVersion>
+</PropertyGroup>
+
+<Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
+	<GetInstalledROOTVersion>
+		<Output TaskParameter="Version"  PropertyName="ROOTInstalledVersion"/>
+		<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath" />
+	</GetInstalledROOTVersion>
+</Target>
+<Target Name="DownloadAndUnpack" AfterTargets="FindInstalledROOTVersion">
+  <DownloadAndUnpackROOT Version="$(ROOTVersion)" InstallationPath="$(SolutionDir)\root" VCVersion="vc11" Condition="$(ROOTInstalledVersion) != $(ROOTVersion)">
+    <Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath"/>
+  </DownloadAndUnpackROOT>
+</Target>
+<Target Name="WriteStartupFile" AfterTargets="DownloadAndUnpack">
+	<ItemGroup>
+		<StartLines Include="@REM Use to start devenv" />
+		<StartLines Include="@set ROOTSYS=$(ROOTSYSPath)" />
+		<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />
+		<StartLines Include="@$(SolutionPath)" />
+	</ItemGroup>
+	<Warning Text="ROOTSYS is not set to the proper value! Please exit and restart devenv with the .bat file called start_$(SolutionName).bat" Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
+	<WriteLinesToFile File="$(SolutionDir)\start_$(SolutionName).bat" Lines="@(StartLines)" Overwrite="true"/>
+</Target>
+</Project>

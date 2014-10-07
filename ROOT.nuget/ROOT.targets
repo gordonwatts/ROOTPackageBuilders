@@ -4,10 +4,6 @@
 <UsingTask TaskName="GetInstalledROOTVersion" AssemblyFile="ROOTMSBuildTasks.dll"/>
 <UsingTask TaskName="DownloadAndUnpackROOT" AssemblyFile="ROOTMSBuildTasks.dll" />
 
-<PropertyGroup>
-  <ROOTVersion>5.34.20</ROOTVersion>
-</PropertyGroup>
-
 <Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
 	<GetInstalledROOTVersion>
 		<Output TaskParameter="Version"  PropertyName="ROOTInstalledVersion"/>
@@ -20,7 +16,15 @@
   </DownloadAndUnpackROOT>
 </Target>
 <Target Name="WriteStartupFile" AfterTargets="DownloadAndUnpack">
-  <ItemGroup>
+	<ItemGroup>
+		<ROOTIDProps Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
+		<ROOTIDProps Include="&lt;Project ToolsVersion=&quot;4.0&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;" />
+		<ROOTIDProps Include="	&lt;PropertyGroup&gt;" />
+		<ROOTIDProps Include="		&lt;ROOTSYS&gt;$(ROOTSYSPath)&lt;/ROOTSYS&gt;" />
+		<ROOTIDProps Include="	&lt;/PropertyGroup&gt;" />
+		<ROOTIDProps Include="&lt;/Project&gt;" />
+	</ItemGroup>
+	<ItemGroup>
 		<StartLines Include="@REM Use to start devenv" />
 		<StartLines Include="@set ROOTSYS=$(ROOTSYSPath)" />
 		<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />

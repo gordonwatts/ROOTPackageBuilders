@@ -32,8 +32,8 @@
 		<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />
 		<StartLines Include="@$(SolutionPath)" />
 	</ItemGroup>
-	<Error Text="The ROOT library had to be reconfigured. Now that that is done the next build should work fine." Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
 	<WriteLinesToFile File="$(SolutionDir)\start_$(SolutionName).bat" Lines="@(StartLines)" Overwrite="true"/>
 	<WriteLinesToFile File="$(ROOTIDFilename)" Lines="@(ROOTIDProps)" Overwrite="true"/>
+	<Error Text="The ROOT library had to be reconfigured. Now that that is done please rebuild to pick up the proper libraries and includes. Reload Visual Studio to get intellisense working." Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
 </Target>
 </Project>

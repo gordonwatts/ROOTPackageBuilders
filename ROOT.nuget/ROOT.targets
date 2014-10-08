@@ -32,7 +32,8 @@
 		<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />
 		<StartLines Include="@$(SolutionPath)" />
 	</ItemGroup>
-	<Warning Text="ROOTSYS is not set to the proper value! Please exit and restart devenv with the .bat file called start_$(SolutionName).bat" Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
+	<Warning Text="ROOTSYS is not set to the proper value! Please rebuild the project and it should be fine." Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
 	<WriteLinesToFile File="$(SolutionDir)\start_$(SolutionName).bat" Lines="@(StartLines)" Overwrite="true"/>
+	<WriteLinesToFile File="$(ROOTIDFilename)" Lines="@(ROOTIDProps)" Overwrite="true"/>
 </Target>
 </Project>

@@ -4,15 +4,17 @@
 		<ROOTVersion>5.34.20</ROOTVersion>
 		<ROOTIDFilename>$(SolutionDir)\root\ROOTID-$(ROOTVersion).props</ROOTIDFilename>
 	</PropertyGroup>
-	<Import Project="$(ROOTIDFilename)" Condition="Exists($(ROOTIDFilename))" />
+	<PropertyGroup Condition="!Exists('$(ROOTSYS)\bin\libCore.dll')">
+		<ROOTSYS>$(SolutionDir)\root\root-$(ROOTVersion)-vc11</ROOTSYS>
+	</PropertyGroup>
 	<ItemDefinitionGroup>
-    <Link>
-      <AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <ClCompile>
-      <ForcedIncludeFiles>w32pragma.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ROOTSYS)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+		<Link>
+		  <AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<ClCompile>
+		  <ForcedIncludeFiles>w32pragma.h</ForcedIncludeFiles>
+		  <AdditionalIncludeDirectories>$(ROOTSYS)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

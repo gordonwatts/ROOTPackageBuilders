@@ -55,3 +55,6 @@ hit build once for your code to build (as long as there is internet, etc.).
 In each case, intellisense should pick up the proper version of ROOT after the first build, and after a rescan of the solution (see Project menu).
 Easiest way to check is right-click on a ROOT include file, open it, and then mouse over the open file tab to check the path.
 
+In cases 1, 2, and 3 there should be a .bat file that contains the proper definition of the ROOTSYS variable and modification to PATH.
+If 10 projects are built at once, they should not fail because of multiple writes to that file.
+

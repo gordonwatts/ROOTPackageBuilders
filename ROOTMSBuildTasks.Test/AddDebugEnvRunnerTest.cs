@@ -45,7 +45,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_oneothervar.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void AddSimpleVarToFileWithVars()
         {
             var t = new AddDebugEnv();
@@ -59,10 +58,18 @@ namespace ROOTMSBuildTasks.Test
         }
 
         [TestMethod]
+        [DeploymentItem("usersettings_alreadysetvar.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void OverwriteSimpleVarFileWithVars()
         {
-            // File has the setting for this var, overwrite
-            Assert.Fail("not hyet");
+            var t = new AddDebugEnv();
+            t.EnvVarName = "TEST";
+            t.EnvValue = "FREAK";
+            t.UserSettingsPath = "usersettings_alreadysetvar.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("usersettings_alreadysetvar.xml");
         }
 
         [TestMethod]

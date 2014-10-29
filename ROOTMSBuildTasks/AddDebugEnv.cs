@@ -93,6 +93,10 @@ namespace ROOTMSBuildTasks
         {
             var proj = f.Descendants(msBuildNamespace + "Project").First();
             var pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => dc.Descendants(msBuildNamespace + "LocalDebuggerEnvironment").Count() > 0).FirstOrDefault();
+            if (pg == null)
+            {
+                pg = proj.Descendants(msBuildNamespace + "PropertyGroup").FirstOrDefault();
+            }
 
             if (pg == null)
                 pg = CreatePropertyGroupNode(proj);
@@ -168,19 +172,6 @@ namespace ROOTMSBuildTasks
             xml.Declaration = new XDeclaration("1.0", "UTF-8", null);
 
             return xml;
-#if false
-            var xml = new XmlDocument();
-
-            var xmlDeclaration = xml.CreateXmlDeclaration("1.0", "UTF-8", null);
-            XmlElement root = xml.DocumentElement;
-            xml.InsertBefore(xmlDeclaration, root);
-            
-            var proj = xml.CreateElement("Project", "http://schemas.microsoft.com/developer/msbuild/2003");
-            proj.SetAttribute("Tools", "12.0");
-            xml.AppendChild(proj);
-
-            return new XDocument(xml);
-#endif
         }
     }
 }

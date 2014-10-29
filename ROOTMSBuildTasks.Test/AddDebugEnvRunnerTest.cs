@@ -17,7 +17,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("upsersettings_empty.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void AddSimpleVariableToEmpty()
         {
             var t = new AddDebugEnv();
@@ -31,10 +30,18 @@ namespace ROOTMSBuildTasks.Test
         }
 
         [TestMethod]
+        [DeploymentItem("usersettings_empty.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void AddSimpleVarToEmptyFile()
         {
-            // File exists, but is empty
-            Assert.Fail("not yet");
+            var t = new AddDebugEnv();
+            t.EnvVarName = "TEST";
+            t.EnvValue = "VALUE";
+            t.UserSettingsPath = "usersettings_empty.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("usersettings_empty.xml");
         }
 
         [TestMethod]

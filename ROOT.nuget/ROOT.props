@@ -14,8 +14,8 @@
 		<ROOTMachineDir>$(ROOTStorageDir)/root-$(ROOTVersion)-vc11</ROOTMachineDir>
 	</PropertyGroup>
 
-	<!--If the local download exists, uses that first. -->
-	<PropertyGroup Condition="Exists($(ROOTMachineDir))">
+	<!--If the local download exists or no ROOTSYS is defined, then default to the local download. -->
+	<PropertyGroup Condition="Exists($(ROOTMachineDir)) Or '$(ROOTSYS)' == ''">
 		<ROOTSYS>$(ROOTMachineDir)</ROOTSYS>
 	</PropertyGroup>
 

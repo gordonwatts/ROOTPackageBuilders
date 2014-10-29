@@ -1,39 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-<!-- The ROOT Build tasks -->
-<UsingTask TaskName="GetInstalledROOTVersion" AssemblyFile="ROOTMSBuildTasks.dll"/>
-<UsingTask TaskName="DownloadAndUnpackROOT" AssemblyFile="ROOTMSBuildTasks.dll" />
+	<!-- The ROOT Build tasks -->
+	<UsingTask TaskName="GetInstalledROOTVersion" AssemblyFile="ROOTMSBuildTasks.dll"/>
+	<UsingTask TaskName="DownloadAndUnpackROOT" AssemblyFile="ROOTMSBuildTasks.dll" />
 
-<Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
-	<Error Text="ROOT supports builds against the DLL Release version of the C++ runtime library. Either use the Release build, or Debug build with the C++ option Code Generation->RunTimeLibrary set correctly (along with the proper preprocessor macros for the STL)" Condition="%(ClCompile.RuntimeLibrary) != MultiThreadedDll" />
-	<Error Text="This ROOT package supports only Visual Studio 2012. Please make sure the platform toolset is set to the 2012 (v110) toolset in the property General dialog." Condition="$(PlatformToolset) != v110"/>
-	<GetInstalledROOTVersion>
-		<Output TaskParameter="Version"  PropertyName="ROOTInstalledVersion"/>
-		<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath" />
-	</GetInstalledROOTVersion>
-</Target>
-<Target Name="DownloadAndUnpack" AfterTargets="FindInstalledROOTVersion">
-  <DownloadAndUnpackROOT Version="$(ROOTVersion)" InstallationPath="$(SolutionDir)\root" VCVersion="vc11" Condition="$(ROOTInstalledVersion) != $(ROOTVersion)">
-    <Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath"/>
-  </DownloadAndUnpackROOT>
-</Target>
-<Target Name="WriteStartupFile" AfterTargets="DownloadAndUnpack">
-	<ItemGroup>
-		<ROOTIDProps Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
-		<ROOTIDProps Include="&lt;Project ToolsVersion=&quot;4.0&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;" />
-		<ROOTIDProps Include="	&lt;PropertyGroup&gt;" />
-		<ROOTIDProps Include="		&lt;ROOTSYS&gt;$(ROOTSYSPath)&lt;/ROOTSYS&gt;" />
-		<ROOTIDProps Include="	&lt;/PropertyGroup&gt;" />
-		<ROOTIDProps Include="&lt;/Project&gt;" />
-	</ItemGroup>
-	<ItemGroup>
-		<StartLines Include="@REM Use to start devenv" />
-		<StartLines Include="@set ROOTSYS=$(ROOTSYSPath)" />
-		<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />
-		<StartLines Include="@$(SolutionPath)" />
-	</ItemGroup>
-	<WriteLinesToFile File="$(SolutionDir)\start_$(SolutionName).bat" Lines="@(StartLines)" Overwrite="true"/>
-	<WriteLinesToFile File="$(ROOTIDFilename)" Lines="@(ROOTIDProps)" Overwrite="true"/>
-	<Error Text="The ROOT library had to be reconfigured. Now that that is done please rebuild to pick up the proper libraries and includes. Reload Visual Studio to get intellisense working." Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
-</Target>
+	<!--Warn the user if they are using an improper version, and if we are using the locally installed version, see what version it is. -->
+	<Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
+		<Error Text="ROOT supports builds against the DLL Release version of the C++ runtime library. Either use the Release build, or Debug build with the C++ option Code Generation->RunTimeLibrary set correctly (along with the proper preprocessor macros for the STL)" Condition="%(ClCompile.RuntimeLibrary) != MultiThreadedDll" />
+		<Error Text="This ROOT package supports only Visual Studio 2012. Please make sure the platform toolset is set to the 2012 (v110) toolset in the property General dialog." Condition="$(PlatformToolset) != v110"/>
+		<GetInstalledROOTVersion Condition="!Exists($(ROOTMachineDir))">
+			<Output TaskParameter="Version"  PropertyName="ROOTInstalledVersion"/>
+			<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath" />
+		</GetInstalledROOTVersion>
+	</Target>
+
+	<!--Download a version of root if we need it-->
+	<Target Name="DownloadAndUnpack" AfterTargets="FindInstalledROOTVersion" Condition="!Exists($(ROOTMachineDir)) And $(ROOTInstalledVersion) != $(ROOTVersion)">
+		<DownloadAndUnpackROOT Version="$(ROOTVersion)" InstallationPath="$(ROOTStorageDir)" VCVersion="vc11">
+			<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath"/>
+		</DownloadAndUnpackROOT>
+		<PropertyGroup>
+			<ROOTSYS>$(ROOTMachineDir)</ROOTSYS>
+		</PropertyGroup>
+	</Target>
+
+	<!--ROOTSYS must be on the PATH and defined to run.-->
+	<!--
+	<Target Name="WriteStartupFile" AfterTargets="DownloadAndUnpack">
+		<ItemGroup>
+			<ROOTIDProps Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
+			<ROOTIDProps Include="&lt;Project ToolsVersion=&quot;4.0&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;" />
+			<ROOTIDProps Include="	&lt;PropertyGroup&gt;" />
+			<ROOTIDProps Include="		&lt;ROOTSYS&gt;$(ROOTSYSPath)&lt;/ROOTSYS&gt;" />
+			<ROOTIDProps Include="	&lt;/PropertyGroup&gt;" />
+			<ROOTIDProps Include="&lt;/Project&gt;" />
+		</ItemGroup>
+		<ItemGroup>
+			<StartLines Include="@REM Use to start devenv" />
+			<StartLines Include="@set ROOTSYS=$(ROOTSYSPath)" />
+			<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />
+			<StartLines Include="@$(SolutionPath)" />
+		</ItemGroup>
+		<WriteLinesToFile File="$(SolutionDir)\start_$(SolutionName).bat" Lines="@(StartLines)" Overwrite="true"/>
+		<WriteLinesToFile File="$(ROOTIDFilename)" Lines="@(ROOTIDProps)" Overwrite="true"/>
+		<Error Text="The ROOT library had to be reconfigured. Now that that is done please rebuild to pick up the proper libraries and includes. Reload Visual Studio to get intellisense working." Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
+	</Target>
+	-->
 </Project>

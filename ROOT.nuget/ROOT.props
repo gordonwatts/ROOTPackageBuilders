@@ -2,19 +2,39 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<ROOTVersion>5.34.20</ROOTVersion>
-		<ROOTIDFilename>$(SolutionDir)\root\ROOTID-$(ROOTVersion).props</ROOTIDFilename>
 	</PropertyGroup>
-	<PropertyGroup Condition="!Exists('$(ROOTSYS)\bin\libCore.dll')">
-		<ROOTSYS>$(SolutionDir)\root\root-$(ROOTVersion)-vc11</ROOTSYS>
+
+	<PropertyGroup Condition="!Exists($(TEMP))">
+		<ROOTStorageDir>$(SolutionDir)\root</ROOTStorageDir>
 	</PropertyGroup>
+	<PropertyGroup Condition="Exists($(TEMP))">
+		<ROOTStorageDir>$(TEMP)\root</ROOTStorageDir>
+	</PropertyGroup>
+	<PropertyGroup>
+		<ROOTMachineDir>$(ROOTStorageDir)/root-$(ROOTVersion)-vc11</ROOTMachineDir>
+	</PropertyGroup>
+
+	<!--If the local download exists, uses that first. -->
+	<PropertyGroup Condition="Exists($(ROOTMachineDir))">
+		<ROOTSYS>$(ROOTMachineDir)</ROOTSYS>
+	</PropertyGroup>
+
+	<!--Looking on the local machine is tricky as we need to make sure that it is the
+		version of ROOT that is actually requested. We have to let a target later on
+		take care of the version check since that requires opening and reading files.-->
+	<PropertyGroup>
+		<ROOTIDFilename>$(ROOTStorageDir)\ROOTID-$(ROOTVersion).props</ROOTIDFilename>
+	</PropertyGroup>	
+	<Import Project="$(ROOTIDFilename)" Condition="Exists($(ROOTIDFilename))" />
+	
 	<ItemDefinitionGroup>
 		<Link>
-		  <AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
 		</Link>
 		<ClCompile>
-		  <ForcedIncludeFiles>w32pragma.h</ForcedIncludeFiles>
-		  <AdditionalIncludeDirectories>$(ROOTSYS)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ForcedIncludeFiles>w32pragma.h</ForcedIncludeFiles>
+			<AdditionalIncludeDirectories>$(ROOTSYS)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 		</ClCompile>
-  </ItemDefinitionGroup>
-  <ItemGroup />
+	</ItemDefinitionGroup>
+	
 </Project>

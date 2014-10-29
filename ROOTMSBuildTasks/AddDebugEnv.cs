@@ -80,8 +80,53 @@ namespace ROOTMSBuildTasks
         /// <param name="f"></param>
         private void AddSetting (XDocument f)
         {
-            var settingsNote = GetSettingsNode(f);
-            settingsNote.Value = string.Format("{0}={1}\n$(LocalDebuggerEnvironment)", EnvVarName, EnvValue);
+            var settingsNode = GetSettingsNode(f);
+            var listOfSettings = ExtractSettings(settingsNode);
+            listOfSettings[EnvVarName] = EnvValue;
+            settingsNode.Value = SettingsToString(listOfSettings);
+        }
+
+        /// <summary>
+        /// Convert the list of settings to a string for use by the IDE.
+        /// </summary>
+        /// <param name="listOfSettings"></param>
+        /// <returns></returns>
+        private string SettingsToString(IDictionary<string, string> listOfSettings)
+        {
+            StringBuilder bld = new StringBuilder();
+            foreach (var item in listOfSettings)
+            {
+                bld.AppendFormat("{0}={1}\n", item.Key, item.Value);
+            }
+            bld.Append("$(LocalDebuggerEnvironment)");
+            return bld.ToString();
+        }
+
+        /// <summary>
+        /// Given a settings guy, parse through it and extract all the settings. One per line.
+        /// </summary>
+        /// <param name="settingsNode"></param>
+        /// <returns></returns>
+        private IDictionary<string, string> ExtractSettings(XElement settingsNode)
+        {
+            Dictionary<string, string> result = new Dictionary<string,string>();
+            using (var rdr = new StringReader(settingsNode.Value))
+            {
+                var line = rdr.ReadLine();
+                while (line != null)
+                {
+                    var eqIndex = line.IndexOf("=");
+                    if (eqIndex > 0)
+                    {
+                        var vName = line.Substring(0, eqIndex).Trim();
+                        var vValue = line.Substring(eqIndex + 1).Trim();
+                        result[vName] = vValue;
+                    }
+
+                    line = rdr.ReadLine();
+                }
+            }
+            return result;
         }
 
         /// <summary>

@@ -31,7 +31,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_empty.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void AddSimpleVarToEmptyFile()
         {
             var t = new AddDebugEnv();
@@ -45,17 +44,18 @@ namespace ROOTMSBuildTasks.Test
         }
 
         [TestMethod]
-        public void AddSimpleVarToFileWithOtherSettings()
-        {
-            // File exists, and has other settings, add to it
-            Assert.Fail("not yet");
-        }
-
-        [TestMethod]
+        [DeploymentItem("usersettings_oneothervar.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void AddSimpleVarToFileWithVars()
         {
-            // FIle has settingsfor other env vars in it
-            Assert.Fail("not hyet");
+            var t = new AddDebugEnv();
+            t.EnvVarName = "TEST";
+            t.EnvValue = "VALUE";
+            t.UserSettingsPath = "usersettings_oneothervar.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("usersettings_oneothervar.xml");
         }
 
         [TestMethod]

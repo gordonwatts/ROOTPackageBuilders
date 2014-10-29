@@ -21,6 +21,8 @@ than install and run, however:
    - If ROOT had to be downloaded, it won't be in your path when you hit build. You can either use the .bat file
      written next to your solution to start visual studio, or use the Debugging pane of the project options to
 	 update the PATH variable with "PATH=$(ROOTSYS)\bin;$(PATH)".
+	 
+--> Rescan Solution (under Project menu) - to update references and includes (automatically happens after 60 minutes).
 
 Developer Instructions
 ------------
@@ -38,4 +40,18 @@ Install CoApp (http://coapp.org/pages/releases.html) Make sure to follow instruc
 
 Then from a ps prompt:
 PackageROOTForNuget.ps1 ftp://root.cern.ch/root/root_v5.34.18.win32.vc11.tar.gz 1 $env:TEMP/root
+
+Scenarios
+---------
+
+I find it tricky, these MSBUILD files. This is a list of situations that this package should handle correctly when you hit build. You should only have to
+hit build once for your code to build (as long as there is internet, etc.).
+
+1. ROOT is not at all installed on the machine anywhere.
+2. ROOT has been downloaded and unpacked into the "common area"
+3. The incorrect version of ROOT has been installed on your machine.
+4. The correct version of ROOT hasg been installed on your machine.
+
+In each case, intellisense should pick up the proper version of ROOT after the first build, and after a rescan of the solution (see Project menu).
+Easiest way to check is right-click on a ROOT include file, open it, and then mouse over the open file tab to check the path.
 

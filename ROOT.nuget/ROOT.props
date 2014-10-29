@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<ROOTVersion>5.34.20</ROOTVersion>
+		<ROOTVersion>5.34.21</ROOTVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="!Exists($(TEMP))">
@@ -15,18 +15,11 @@
 	</PropertyGroup>
 
 	<!--If the local download exists or no ROOTSYS is defined, then default to the local download. -->
-	<PropertyGroup Condition="Exists($(ROOTMachineDir)) Or '$(ROOTSYS)' == ''">
+	<PropertyGroup Condition="Exists($(ROOTMachineDir))">
 		<ROOTSYS>$(ROOTMachineDir)</ROOTSYS>
 	</PropertyGroup>
 
-	<!--Looking on the local machine is tricky as we need to make sure that it is the
-		version of ROOT that is actually requested. We have to let a target later on
-		take care of the version check since that requires opening and reading files.-->
-	<PropertyGroup>
-		<ROOTIDFilename>$(ROOTStorageDir)\ROOTID-$(ROOTVersion).props</ROOTIDFilename>
-	</PropertyGroup>	
-	<Import Project="$(ROOTIDFilename)" Condition="Exists($(ROOTIDFilename))" />
-	
+	<!--Now configure the actual build.-->
 	<ItemDefinitionGroup>
 		<Link>
 			<AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>

@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddDebugEnv.cs" />
     <Compile Include="DownloadAndUnpackROOT.cs" />
     <Compile Include="GetInstalledROOTVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

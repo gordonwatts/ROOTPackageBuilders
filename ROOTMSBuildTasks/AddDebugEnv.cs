@@ -31,8 +31,8 @@ namespace ROOTMSBuildTasks
         /// How we will set the env variable
         /// </summary>
         public enum HowToSetEnvValue {
-            PrefixValue, // Prepend, with the $() after the new value
-            PostfixValue, // Post-pend, with the $() before the new value
+            PrefixAsPathValue, // Prepend the new setting, then a ";" then the old value
+            PostfixAsPathValue, // The old value, then a ";", and then the new value.
             Set // Just set
         };
 
@@ -82,8 +82,33 @@ namespace ROOTMSBuildTasks
         {
             var settingsNode = GetSettingsNode(f);
             var listOfSettings = ExtractSettings(settingsNode);
-            listOfSettings[EnvVarName] = EnvValue;
+            listOfSettings[EnvVarName] = BuildNewSettingValue(listOfSettings.ContainsKey(EnvVarName) ? listOfSettings[EnvVarName] : null);
             settingsNode.Value = SettingsToString(listOfSettings);
+        }
+
+        /// <summary>
+        /// Given the old setting, construct a new setting depending on how we have been
+        /// configured.
+        /// </summary>
+        /// <param name="oldSetting"></param>
+        /// <returns></returns>
+        private string BuildNewSettingValue(string oldSetting)
+        {
+            switch (_envSetGuidance)
+            {
+                case HowToSetEnvValue.PrefixAsPathValue:
+                    return string.Format("{0};$({1})", EnvValue, EnvVarName);
+
+                case HowToSetEnvValue.PostfixAsPathValue:
+                    return string.Format("$({0});{1}", EnvVarName, EnvValue);
+
+                case HowToSetEnvValue.Set:
+                    // Just a straight replacement
+                    return EnvValue;
+
+                default:
+                    throw new ArgumentException(string.Format("Do not know how to set with '{0}'.", _envSetGuidance.ToString()));
+            }
         }
 
         /// <summary>

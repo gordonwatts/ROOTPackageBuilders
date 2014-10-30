@@ -59,7 +59,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_alreadysetvar.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void OverwriteSimpleVarFileWithVars()
         {
             var t = new AddDebugEnv();
@@ -73,17 +72,48 @@ namespace ROOTMSBuildTasks.Test
         }
 
         [TestMethod]
+        [DeploymentItem("upsersettings_empty.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void SetWithAppend()
         {
-            // Set with an append
-            Assert.Fail("not hyet");
+            // Set PATH, prepend, and there was no setting done yet.
+            var t = new AddDebugEnv();
+            t.EnvVarName = "PATH";
+            t.EnvValue = "c:\\root";
+            t.EnvSetGuidance = "PostfixAsPathValue";
+            t.UserSettingsPath = "upsersettings_empty.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("upsersettings_empty.xml");
         }
 
         [TestMethod]
+        [DeploymentItem("upsersettings_empty.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void SetWithPrepend()
         {
-            // Set with an append
-            Assert.Fail("not hyet");
+            var t = new AddDebugEnv();
+            t.EnvVarName = "PATH";
+            t.EnvValue = "c:\\root";
+            t.EnvSetGuidance = "PrefixAsPathValue";
+            t.UserSettingsPath = "upsersettings_empty.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("upsersettings_empty.xml");
+        }
+
+        [TestMethod]
+        public void SetToSameValue()
+        {
+            Assert.Fail("File shoudl not be touched");
+        }
+
+        [TestMethod]
+        public void AddPathWithValueAlreadyThere()
+        {
+            Assert.Fail("File should not be touched");
         }
     }
 }

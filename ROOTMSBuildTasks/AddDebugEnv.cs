@@ -26,17 +26,17 @@ namespace ROOTMSBuildTasks
         /// </summary>
         [Required]
         public string EnvValue { get; set; }
-        
+
         /// <summary>
         /// How we will set the env variable
         /// </summary>
-        public enum HowToSetEnvValue {
+        public enum HowToSetEnvValue
+        {
             PrefixAsPathValue, // Prepend the new setting, then a ";" then the old value
             PostfixAsPathValue, // The old value, then a ";", and then the new value.
             Set // Just set
         };
 
-        /// <summary>
         /// Path to the user settings file.
         /// </summary>
         [Required]

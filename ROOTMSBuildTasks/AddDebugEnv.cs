@@ -115,11 +115,11 @@ namespace ROOTMSBuildTasks
             switch (_envSetGuidance)
             {
                 case HowToSetEnvValue.PrefixAsPathValue:
-                    FileHadToBeUpdated = true;
+                    FileHadToBeUpdated = !PathContainsValue (EnvValue, oldSetting);
                     return string.Format("{0};{1}", EnvValue, oldSetting);
 
                 case HowToSetEnvValue.PostfixAsPathValue:
-                    FileHadToBeUpdated = true;
+                    FileHadToBeUpdated = !PathContainsValue (EnvValue, oldSetting);
                     return string.Format("{0};{1}", oldSetting, EnvValue);
 
                 case HowToSetEnvValue.Set:
@@ -130,6 +130,18 @@ namespace ROOTMSBuildTasks
                 default:
                     throw new ArgumentException(string.Format("Do not know how to set with '{0}'.", _envSetGuidance.ToString()));
             }
+        }
+
+        /// <summary>
+        /// Given a ";" seperated path, look to see if one is in the other.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="pathList"></param>
+        /// <returns></returns>
+        private bool PathContainsValue(string value, string pathList)
+        {
+            var plist = pathList.Split(';');
+            return plist.Contains(value);
         }
 
         /// <summary>

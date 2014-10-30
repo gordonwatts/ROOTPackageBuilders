@@ -136,7 +136,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_path.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void SetToSameValue()
         {
             var f = new FileInfo("usersettings_path.xml");
@@ -153,9 +152,23 @@ namespace ROOTMSBuildTasks.Test
         }
 
         [TestMethod]
+        [DeploymentItem("usersettings_alreadypath.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void AddPathWithValueAlreadyThere()
         {
-            Assert.Fail("File should not be touched");
+            var f = new FileInfo("usersettings_alreadypath.xml");
+            var cModTime = f.LastWriteTime;
+
+            var t = new AddDebugEnv();
+            t.EnvVarName = "PATH";
+            t.EnvValue = "c:\\root";
+            t.EnvSetGuidance = "PrefixAsPathValue";
+            t.UserSettingsPath = "usersettings_alreadypath.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            f.Refresh();
+            Assert.AreEqual(cModTime, f.LastWriteTime);
         }
     }
 }

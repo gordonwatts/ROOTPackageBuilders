@@ -34,7 +34,7 @@ namespace ROOTMSBuildTasks
         {
             PrefixAsPathValue, // Prepend the new setting, then a ";" then the old value
             PostfixAsPathValue, // The old value, then a ";", and then the new value.
-            Set // Just set
+            Set // Just set (this is the default value)
         };
 
         /// Path to the user settings file.
@@ -105,7 +105,7 @@ namespace ROOTMSBuildTasks
         private string BuildNewSettingValue(string oldSetting)
         {
             // The old setting is what we replace. If it is null, then it is whatever the env var was before.
-
+            // This is only used if we are treating the env like a path variable.
             if (oldSetting == null)
             {
                 oldSetting = string.Format("$({0})", EnvVarName);
@@ -115,16 +115,18 @@ namespace ROOTMSBuildTasks
             switch (_envSetGuidance)
             {
                 case HowToSetEnvValue.PrefixAsPathValue:
+                    // Prepend the value
                     FileHadToBeUpdated = !PathContainsValue (EnvValue, oldSetting);
                     return string.Format("{0};{1}", EnvValue, oldSetting);
 
                 case HowToSetEnvValue.PostfixAsPathValue:
+                    // Append the value
                     FileHadToBeUpdated = !PathContainsValue (EnvValue, oldSetting);
                     return string.Format("{0};{1}", oldSetting, EnvValue);
 
                 case HowToSetEnvValue.Set:
-                    FileHadToBeUpdated = oldSetting != EnvValue;
                     // Just a straight replacement
+                    FileHadToBeUpdated = oldSetting != EnvValue;
                     return EnvValue;
 
                 default:
@@ -225,6 +227,11 @@ namespace ROOTMSBuildTasks
             return pgNode;
         }
 
+        /// <summary>
+        /// Create a PropertyGroup node.
+        /// </summary>
+        /// <param name="proj"></param>
+        /// <returns></returns>
         private XElement CreatePropertyGroupNode(XElement proj)
         {
             var elm = new XElement(msBuildNamespace + "PropertyGroup");
@@ -261,6 +268,9 @@ namespace ROOTMSBuildTasks
             f.Save(UserSettingsPath);
         }
 
+        /// <summary>
+        /// Cache for the namespace, as everything is in it...
+        /// </summary>
         private XNamespace msBuildNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
 
         /// <summary>

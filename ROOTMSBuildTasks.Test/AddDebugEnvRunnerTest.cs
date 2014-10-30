@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ROOTMSBuildTasks;
 using ApprovalTests;
 using ApprovalTests.Reporters;
+using System.IO;
 
 namespace ROOTMSBuildTasks.Test
 {
@@ -104,7 +105,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_path.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void SetExistingPathWithAppend()
         {
             // Set PATH, prepend, and there was no setting done yet.
@@ -121,7 +121,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_path.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void SetExistingPathWithPrepend()
         {
             var t = new AddDebugEnv();
@@ -136,9 +135,21 @@ namespace ROOTMSBuildTasks.Test
         }
 
         [TestMethod]
+        [DeploymentItem("usersettings_path.xml")]
+        [UseReporter(typeof(DiffReporter))]
         public void SetToSameValue()
         {
-            Assert.Fail("File shoudl not be touched");
+            var f = new FileInfo("usersettings_path.xml");
+            var cModTime = f.LastWriteTime;
+            var t = new AddDebugEnv();
+            t.EnvVarName = "ROOT";
+            t.EnvValue = "DUDE";
+            t.UserSettingsPath = "usersettings_path.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            f.Refresh();
+            Assert.AreEqual(cModTime, f.LastWriteTime);
         }
 
         [TestMethod]

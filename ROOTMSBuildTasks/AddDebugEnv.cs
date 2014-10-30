@@ -57,11 +57,18 @@ namespace ROOTMSBuildTasks
         }
 
         /// <summary>
+        /// True if the file was updated. If no change was required, then the file isn't written out.
+        /// </summary>
+        public bool FileHadToBeUpdated { get; private set; }
+
+        /// <summary>
         /// Load in the project file and set it, if it needs setting.
         /// </summary>
         /// <returns></returns>
         public override bool Execute()
         {
+            FileHadToBeUpdated = false;
+
             // Load up the old file
             var f = LoadSettingsFile(UserSettingsPath);
 
@@ -69,7 +76,10 @@ namespace ROOTMSBuildTasks
             AddSetting(f);
 
             // Write it out
-            SaveSettingsFile(f);
+            if (FileHadToBeUpdated)
+            {
+                SaveSettingsFile(f);
+            }
 
             return true;
         }
@@ -105,12 +115,15 @@ namespace ROOTMSBuildTasks
             switch (_envSetGuidance)
             {
                 case HowToSetEnvValue.PrefixAsPathValue:
+                    FileHadToBeUpdated = true;
                     return string.Format("{0};{1}", EnvValue, oldSetting);
 
                 case HowToSetEnvValue.PostfixAsPathValue:
+                    FileHadToBeUpdated = true;
                     return string.Format("{0};{1}", oldSetting, EnvValue);
 
                 case HowToSetEnvValue.Set:
+                    FileHadToBeUpdated = oldSetting != EnvValue;
                     // Just a straight replacement
                     return EnvValue;
 

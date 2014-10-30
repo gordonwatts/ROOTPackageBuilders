@@ -73,7 +73,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("upsersettings_empty.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void SetWithAppend()
         {
             // Set PATH, prepend, and there was no setting done yet.
@@ -90,7 +89,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("upsersettings_empty.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void SetWithPrepend()
         {
             var t = new AddDebugEnv();
@@ -102,6 +100,39 @@ namespace ROOTMSBuildTasks.Test
             Assert.IsTrue(t.Execute());
 
             Approvals.VerifyFile("upsersettings_empty.xml");
+        }
+
+        [TestMethod]
+        [DeploymentItem("usersettings_path.xml")]
+        [UseReporter(typeof(DiffReporter))]
+        public void SetExistingPathWithAppend()
+        {
+            // Set PATH, prepend, and there was no setting done yet.
+            var t = new AddDebugEnv();
+            t.EnvVarName = "PATH";
+            t.EnvValue = "c:\\root";
+            t.EnvSetGuidance = "PostfixAsPathValue";
+            t.UserSettingsPath = "usersettings_path.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("usersettings_path.xml");
+        }
+
+        [TestMethod]
+        [DeploymentItem("usersettings_path.xml")]
+        [UseReporter(typeof(DiffReporter))]
+        public void SetExistingPathWithPrepend()
+        {
+            var t = new AddDebugEnv();
+            t.EnvVarName = "PATH";
+            t.EnvValue = "c:\\root";
+            t.EnvSetGuidance = "PrefixAsPathValue";
+            t.UserSettingsPath = "usersettings_path.xml";
+
+            Assert.IsTrue(t.Execute());
+
+            Approvals.VerifyFile("usersettings_path.xml");
         }
 
         [TestMethod]

@@ -94,13 +94,21 @@ namespace ROOTMSBuildTasks
         /// <returns></returns>
         private string BuildNewSettingValue(string oldSetting)
         {
+            // The old setting is what we replace. If it is null, then it is whatever the env var was before.
+
+            if (oldSetting == null)
+            {
+                oldSetting = string.Format("$({0})", EnvVarName);
+            }
+
+            // Now, figure out where to make the placement.
             switch (_envSetGuidance)
             {
                 case HowToSetEnvValue.PrefixAsPathValue:
-                    return string.Format("{0};$({1})", EnvValue, EnvVarName);
+                    return string.Format("{0};{1}", EnvValue, oldSetting);
 
                 case HowToSetEnvValue.PostfixAsPathValue:
-                    return string.Format("$({0});{1}", EnvVarName, EnvValue);
+                    return string.Format("{0};{1}", oldSetting, EnvValue);
 
                 case HowToSetEnvValue.Set:
                     // Just a straight replacement

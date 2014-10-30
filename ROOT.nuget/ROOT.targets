@@ -3,6 +3,7 @@
 	<!-- The ROOT Build tasks -->
 	<UsingTask TaskName="GetInstalledROOTVersion" AssemblyFile="ROOTMSBuildTasks.dll"/>
 	<UsingTask TaskName="DownloadAndUnpackROOT" AssemblyFile="ROOTMSBuildTasks.dll" />
+	<UsingTask TaskName="AddDebugEnv" AssemblyFile="ROOTMSBuildTasks.dll" />
 
 	<!--Warn the user if they are using an improper version, and if we are using the locally installed version, see what version it is. -->
 	<Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
@@ -25,27 +26,10 @@
 		</PropertyGroup>
 		<Message Text="ROOTSYS after download guy is $(ROOTSYS)" />
 	</Target>
-
-	<!--ROOTSYS must be on the PATH and defined to run.-->
-	<!--
-	<Target Name="WriteStartupFile" AfterTargets="DownloadAndUnpack">
-		<ItemGroup>
-			<ROOTIDProps Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
-			<ROOTIDProps Include="&lt;Project ToolsVersion=&quot;4.0&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;" />
-			<ROOTIDProps Include="	&lt;PropertyGroup&gt;" />
-			<ROOTIDProps Include="		&lt;ROOTSYS&gt;$(ROOTSYSPath)&lt;/ROOTSYS&gt;" />
-			<ROOTIDProps Include="	&lt;/PropertyGroup&gt;" />
-			<ROOTIDProps Include="&lt;/Project&gt;" />
-		</ItemGroup>
-		<ItemGroup>
-			<StartLines Include="@REM Use to start devenv" />
-			<StartLines Include="@set ROOTSYS=$(ROOTSYSPath)" />
-			<StartLines Include="@set PATH=$(ROOTSYSPath)\bin%3B%PATH%" />
-			<StartLines Include="@$(SolutionPath)" />
-		</ItemGroup>
-		<WriteLinesToFile File="$(SolutionDir)\start_$(SolutionName).bat" Lines="@(StartLines)" Overwrite="true"/>
-		<WriteLinesToFile File="$(ROOTIDFilename)" Lines="@(ROOTIDProps)" Overwrite="true"/>
-		<Error Text="The ROOT library had to be reconfigured. Now that that is done please rebuild to pick up the proper libraries and includes. Reload Visual Studio to get intellisense working." Condition="$(ROOTSYSPath) != $(ROOTSYS)" />
+	
+	<Target Name="UpdateRunningEnvVars" AfterTargets="FindInstalledROOTVersion">
+		<AddDebugEnv EnvVarName="ROOTSYS" EnvValue="$(ROOTSYS)" UserSettingsPath="$(ProjectPath).user" />
+		<AddDebugEnv EnvVarName="PATH" EnvValue="%24(ROOTSYS)\bin" EnvSetGuidance="PrefixAsPathValue" UserSettingsPath="$(ProjectPath).user" />
+		<Message Text="Updated user options file to run with root" />
 	</Target>
-	-->
 </Project>

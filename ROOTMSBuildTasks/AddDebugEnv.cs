@@ -197,10 +197,10 @@ namespace ROOTMSBuildTasks
         private XElement GetSettingsNode(XDocument f)
         {
             var proj = f.Descendants(msBuildNamespace + "Project").First();
-            var pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => dc.Descendants(msBuildNamespace + "LocalDebuggerEnvironment").Count() > 0).FirstOrDefault();
+            var pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => dc.Attribute("Condition") == null && dc.Descendants(msBuildNamespace + "LocalDebuggerEnvironment").Count() > 0).FirstOrDefault();
             if (pg == null)
             {
-                pg = proj.Descendants(msBuildNamespace + "PropertyGroup").FirstOrDefault();
+                pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => dc.Attribute("Condition") == null).FirstOrDefault();
             }
 
             if (pg == null)

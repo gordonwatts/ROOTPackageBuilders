@@ -153,7 +153,6 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_alreadypath.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void AddPathWithValueAlreadyThere()
         {
             var f = new FileInfo("usersettings_alreadypath.xml");
@@ -169,6 +168,20 @@ namespace ROOTMSBuildTasks.Test
 
             f.Refresh();
             Assert.AreEqual(cModTime, f.LastWriteTime);
+        }
+
+        [TestMethod]
+        [DeploymentItem("usersettings_debrel.xml")]
+        [UseReporter(typeof(DiffReporter))]
+        public void AddVarWhenExistingVarHasDebugAndRelPropGroups()
+        {
+            var t = new AddDebugEnv();
+            t.EnvVarName = "ROOTSYS";
+            t.EnvValue = "c:\\root";
+            t.UserSettingsPath = "usersettings_debrel.xml";
+
+            Assert.IsTrue(t.Execute());
+            Approvals.VerifyFile("usersettings_debrel.xml");
         }
     }
 }

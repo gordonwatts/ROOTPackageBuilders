@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ROOT</id>
-    <version>5.34.20.3</version>
+    <version>5.34.20.4</version>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <owners>G. Watts</owners>
     <authors>The ROOT Team @ CERN</authors>
@@ -12,7 +12,7 @@
     <tags>Data Analysis C++ ROOT TTree TH1 nativepackage</tags>
     <summary>Native package to build against the ROOT libraries.</summary>
     <licenseUrl>http://root.cern.ch/drupal/content/license</licenseUrl>
-    <releaseNotes>Version 5.34.20</releaseNotes>
+    <releaseNotes>Version 5.34.20 and work if ROOT is installed in the default location, but ROOTSYS not declared</releaseNotes>
     <projectUrl>https://github.com/gordonwatts/ROOTPackageBuilders/</projectUrl>
     <copyright />
   </metadata>

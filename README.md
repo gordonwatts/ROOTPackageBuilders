@@ -46,7 +46,8 @@ hit build once for your code to build (as long as there is internet, etc.). This
 1. ROOT is not at all installed on the machine anywhere.
 2. ROOT has been downloaded and unpacked into the "common area"
 3. The incorrect version of ROOT has been installed on your machine.
-4. The correct version of ROOT hasg been installed on your machine.
+4. The correct version of ROOT has been installed on your machine, and ROOTSYS is correctly defined.
+5. The correct version of ROOT has been installed on your machine, and ROOTSYS is not defined.
 
 In each case, intellisense should pick up the proper version of ROOT after the first build, and after a rescan of the solution (see Project menu).
 Easiest way to check is right-click on a ROOT include file, open it, and then mouse over the open file tab to check the path.

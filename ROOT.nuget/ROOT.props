@@ -16,7 +16,8 @@
 
 	<!--If the local download exists or no ROOTSYS is defined, then default to the local download. -->
 	<PropertyGroup Condition="Exists($(ROOTMachineDir)) Or '$(ROOTSYS)' == ''">
-		<ROOTSYS>$(ROOTMachineDir)</ROOTSYS>
+		<ROOTSYS Condition="Exists('c:\root')" >c:\root</ROOTSYS>
+		<ROOTSYS Condition="!Exists('c:\root')">$(ROOTMachineDir)</ROOTSYS>
 	</PropertyGroup>
 
 	<!--Now configure the actual build.-->

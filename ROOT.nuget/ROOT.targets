@@ -28,8 +28,8 @@
 	</Target>
 	
 	<Target Name="UpdateRunningEnvVars" AfterTargets="FindInstalledROOTVersion">
-		<AddDebugEnv EnvVarName="ROOTSYS" EnvValue="$(ROOTSYS)" UserSettingsPath="$(ProjectPath).user" />
-		<AddDebugEnv EnvVarName="PATH" EnvValue="%24(ROOTSYS)\bin" EnvSetGuidance="PrefixAsPathValue" UserSettingsPath="$(ProjectPath).user" />
+		<AddDebugEnv EnvVarName="ROOTSYS" EnvValue="$(ROOTSYS)" UserSettingsPath="$(ProjectPath).user" ConfigPlatform ="$(Configuration)|$(Platform)"/>
+		<AddDebugEnv EnvVarName="PATH" EnvValue="%24(ROOTSYS)\bin" EnvSetGuidance="PrefixAsPathValue" UserSettingsPath="$(ProjectPath).user" ConfigPlatform ="$(Configuration)|$(Platform)"/>
 		<Message Text="Updated user options file to run with root" />
 	</Target>
 </Project>

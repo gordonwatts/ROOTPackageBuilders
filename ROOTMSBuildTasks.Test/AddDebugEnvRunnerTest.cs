@@ -23,6 +23,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "TEST";
             t.EnvValue = "VALUE";
+            t.ConfigPlatform = "Debug|Win32";
             t.UserSettingsPath = "usersettings.xml";
 
             Assert.IsTrue(t.Execute());
@@ -37,6 +38,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "TEST";
             t.EnvValue = "VALUE";
+            t.ConfigPlatform = "Debug|Win32";
             t.UserSettingsPath = "usersettings_empty.xml";
 
             Assert.IsTrue(t.Execute());
@@ -51,6 +53,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "TEST";
             t.EnvValue = "VALUE";
+            t.ConfigPlatform = "Debug|Win32";
             t.UserSettingsPath = "usersettings_oneothervar.xml";
 
             Assert.IsTrue(t.Execute());
@@ -65,6 +68,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "TEST";
             t.EnvValue = "FREAK";
+            t.ConfigPlatform = "Debug|Win32";
             t.UserSettingsPath = "usersettings_alreadysetvar.xml";
 
             Assert.IsTrue(t.Execute());
@@ -80,6 +84,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "PATH";
             t.EnvValue = "c:\\root";
+            t.ConfigPlatform = "Debug|Win32";
             t.EnvSetGuidance = "PostfixAsPathValue";
             t.UserSettingsPath = "upsersettings_empty.xml";
 
@@ -95,6 +100,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "PATH";
             t.EnvValue = "c:\\root";
+            t.ConfigPlatform = "Debug|Win32";
             t.EnvSetGuidance = "PrefixAsPathValue";
             t.UserSettingsPath = "upsersettings_empty.xml";
 
@@ -111,6 +117,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "PATH";
             t.EnvValue = "c:\\root";
+            t.ConfigPlatform = "Debug|Win32";
             t.EnvSetGuidance = "PostfixAsPathValue";
             t.UserSettingsPath = "usersettings_path.xml";
 
@@ -121,11 +128,13 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_path.xml")]
+        //[UseReporter(typeof(DiffReporter))]
         public void SetExistingPathWithPrepend()
         {
             var t = new AddDebugEnv();
             t.EnvVarName = "PATH";
             t.EnvValue = "c:\\root";
+            t.ConfigPlatform = "Debug|Win32";
             t.EnvSetGuidance = "PrefixAsPathValue";
             t.UserSettingsPath = "usersettings_path.xml";
 
@@ -141,6 +150,7 @@ namespace ROOTMSBuildTasks.Test
             var f = new FileInfo("usersettings_path.xml");
             var cModTime = f.LastWriteTime;
             var t = new AddDebugEnv();
+            t.ConfigPlatform = "Debug|Win32";
             t.EnvVarName = "ROOT";
             t.EnvValue = "DUDE";
             t.UserSettingsPath = "usersettings_path.xml";
@@ -161,6 +171,7 @@ namespace ROOTMSBuildTasks.Test
             var t = new AddDebugEnv();
             t.EnvVarName = "PATH";
             t.EnvValue = "c:\\root";
+            t.ConfigPlatform = "Debug|Win32";
             t.EnvSetGuidance = "PrefixAsPathValue";
             t.UserSettingsPath = "usersettings_alreadypath.xml";
 
@@ -172,12 +183,12 @@ namespace ROOTMSBuildTasks.Test
 
         [TestMethod]
         [DeploymentItem("usersettings_debrel.xml")]
-        [UseReporter(typeof(DiffReporter))]
         public void AddVarWhenExistingVarHasDebugAndRelPropGroups()
         {
             var t = new AddDebugEnv();
             t.EnvVarName = "ROOTSYS";
             t.EnvValue = "c:\\root";
+            t.ConfigPlatform = "Debug|Win32";
             t.UserSettingsPath = "usersettings_debrel.xml";
 
             Assert.IsTrue(t.Execute());

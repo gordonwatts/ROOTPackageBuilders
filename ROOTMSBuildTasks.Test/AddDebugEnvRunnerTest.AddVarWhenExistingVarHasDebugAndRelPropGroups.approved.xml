@@ -1,10 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerEnvironment>
-			PYTHIA8DATA=$(TargetDir)\Pythia8Data
-			$(LocalDebuggerEnvironment)
-		</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PYTHIA8DATA=$(TargetDir)\Pythia8Data
+ROOTSYS=c:\root
+$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -14,9 +13,5 @@
 		</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>-nEvents 1000</LocalDebuggerCommandArguments>
-  </PropertyGroup>
-  <PropertyGroup>
-    <LocalDebuggerEnvironment>ROOTSYS=c:\root
-$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

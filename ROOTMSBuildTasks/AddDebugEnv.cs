@@ -27,6 +27,17 @@ namespace ROOTMSBuildTasks
         [Required]
         public string EnvValue { get; set; }
 
+        /// Path to the user settings file.
+        /// </summary>
+        [Required]
+        public string UserSettingsPath { get; set; }
+
+        /// <summary>
+        /// For which configuration and platofrm should we be setting this?
+        /// </summary>
+        [Required]
+        public string ConfigPlatform { get; set; }
+
         /// <summary>
         /// How we will set the env variable
         /// </summary>
@@ -36,11 +47,6 @@ namespace ROOTMSBuildTasks
             PostfixAsPathValue, // The old value, then a ";", and then the new value.
             Set // Just set (this is the default value)
         };
-
-        /// Path to the user settings file.
-        /// </summary>
-        [Required]
-        public string UserSettingsPath { get; set; }
 
         /// <summary>
         /// Local variable reflecting what is set (or not).
@@ -190,6 +196,28 @@ namespace ROOTMSBuildTasks
         }
 
         /// <summary>
+        /// Returns the condition test
+        /// </summary>
+        /// <returns></returns>
+        private string ConditionString()
+        {
+            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", ConfigPlatform);
+        }
+
+        /// <summary>
+        /// Does this element have a good condition?
+        /// </summary>
+        /// <param name="atr"></param>
+        /// <returns></returns>
+        private bool HasGoodCondition(XElement atr)
+        {
+            var c = atr.Attribute("Condition");
+            if (c == null)
+                return false;
+            return c.Value == ConditionString();
+        }
+
+        /// <summary>
         /// Get the local debug env node
         /// </summary>
         /// <param name="f"></param>
@@ -197,10 +225,10 @@ namespace ROOTMSBuildTasks
         private XElement GetSettingsNode(XDocument f)
         {
             var proj = f.Descendants(msBuildNamespace + "Project").First();
-            var pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => dc.Attribute("Condition") == null && dc.Descendants(msBuildNamespace + "LocalDebuggerEnvironment").Count() > 0).FirstOrDefault();
+            var pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => HasGoodCondition(dc) && dc.Descendants(msBuildNamespace + "LocalDebuggerEnvironment").Count() > 0).FirstOrDefault();
             if (pg == null)
             {
-                pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => dc.Attribute("Condition") == null).FirstOrDefault();
+                pg = proj.Descendants(msBuildNamespace + "PropertyGroup").Where(dc => HasGoodCondition(dc)).FirstOrDefault();
             }
 
             if (pg == null)
@@ -235,6 +263,8 @@ namespace ROOTMSBuildTasks
         private XElement CreatePropertyGroupNode(XElement proj)
         {
             var elm = new XElement(msBuildNamespace + "PropertyGroup");
+            var cond = new XAttribute("Condition", ConditionString());
+            elm.Add(cond);
             proj.Add(elm);
             return elm;
         }

@@ -12,23 +12,24 @@ function Get-ScriptDirectory ()
 #
 # Should be run in a location that can deal with creating whatever is needed.
 #
-function New-ROOTNugetPackage ($version)
+function New-ROOTNugetPackage ($rootVersion, $nugetVersion)
 {
     # Get the directory ready for the various nuget files.
-    $basedir = "$PWD/$version"
+    $basedir = "$PWD/$rootVersion"
     if (Test-Path $basedir) {
         Remove-Item -Recurse $basedir
     }
     $v = New-Item $basedir -ItemType Directory
 
-    # Create the targets file
+    # Create the targets file, and copy them over to the new directory
     $scriptDirectory = Get-ScriptDirectory
-    $(Get-Content "$scriptDirectory/ROOT.targets") -replace "5.34.20",$version > "$basedir/ROOT-Binaries.targets"
-    $(Get-Content "$scriptDirectory/ROOT-Binaries.nuspec") -replace "5.34.20",$version > "$basedir/ROOT-Binaries.nuspec"
+    $(Get-Content "$scriptDirectory/ROOT.nuget/FullROOT.nuspec") -replace "5.34.20",$rootVersion -replace "534.20.8",$nugetVersion > "$basedir/FullROOT.nuspec"
+    $(Get-Content "$scriptDirectory/ROOT.nuget/ROOT.props") -replace "5.34.20",$rootVersion > "$basedir/ROOT.props"
+	Copy-Item $scriptDirectory/ROOT.nuget/ROOT.targets $basedir/ROOT.targets
 
     # Run nuget.
-    cd $basedir
-    nuget pack $scriptDirectory/ROOT-Binaries.nuspec
+    #cd $basedir
+    nuget pack $basedir/FullROOT.nuspec
 }
 
 # What we will give to the world

@@ -12,7 +12,7 @@
     <tags>Data Analysis C++ ROOT TTree TH1 nativepackage</tags>
     <summary>Native package to build against the ROOT libraries.</summary>
     <licenseUrl>http://root.cern.ch/drupal/content/license</licenseUrl>
-    <releaseNotes>Version 5.34.20 of root. Bug fix to deal with release/debug settings.</releaseNotes>
+    <releaseNotes>Version 5.34.20 of root.</releaseNotes>
     <projectUrl>https://github.com/gordonwatts/ROOTPackageBuilders/</projectUrl>
     <copyright />
   </metadata>

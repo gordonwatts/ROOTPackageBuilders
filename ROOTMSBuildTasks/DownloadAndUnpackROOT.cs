@@ -66,11 +66,11 @@ namespace ROOTMSBuildTasks
             // Build the URL, and then download the file.
             string url = string.Format("ftp://root.cern.ch/root/root_v{0}.win32.{1}.tar.gz", Version, VCVersion);
             string filePath = Path.Combine(new string[] { InstallationPath, string.Format("root_v{0}.win32.{1}.tar.gz", Version, VCVersion) });
-            Log.LogMessage(MessageImportance.Low, "Downloading from URL {0} to location {1}", url, filePath);
 
             if (!File.Exists(filePath))
             {
                 // If we are here we are going to have to do the complete download. Log a message first.
+                Log.LogMessage(MessageImportance.Low, "Downloading from URL {0} to location {1}", url, filePath);
                 Log.LogMessage(MessageImportance.High, string.Format("Downloading ROOT v{0}", Version));
 
                 // Create the directory
@@ -81,7 +81,14 @@ namespace ROOTMSBuildTasks
 
                 // Do the download
                 WebClient webClient = new WebClient();
-                webClient.DownloadFile(url, filePath);
+                try
+                {
+                    webClient.DownloadFile(url, filePath);
+                }
+                catch (WebException e)
+                {
+                    throw new InvalidOperationException(string.Format("Failed to download from {0}.", url), e);
+                }
             }
 
             // Next, unpack the downloaded file.

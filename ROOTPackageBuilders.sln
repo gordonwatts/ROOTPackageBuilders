@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSBuildTasks", "MSBuildTasks", "{D30B65A6-11C2-4FC5-BD86-23EA0D2F8250}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ROOTMSBuildTasks", "ROOTMSBuildTasks\ROOTMSBuildTasks.csproj", "{AB5F3629-389C-4701-A92B-F8E28BB58C90}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{4C4C226B-0D84-45C2-96F2-15D67CF88ADB}"
+	ProjectSection(SolutionItems) = preProject
+		ROOTNuGetPackageBuilders.psm1 = ROOTNuGetPackageBuilders.psm1
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ROOTMSBuildTasks.Test", "ROOTMSBuildTasks.Test\ROOTMSBuildTasks.Test.csproj", "{6F918F45-0D23-46F1-B938-7ED10463E389}"
 EndProject

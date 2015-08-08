@@ -23,7 +23,7 @@ function New-ROOTNugetPackage ($rootVersion, $nugetVersion)
 
     # Create the targets file, and copy them over to the new directory
     $scriptDirectory = Get-ScriptDirectory
-    $(Get-Content "$scriptDirectory/ROOT.nuget/FullROOT.nuspec") -replace "5.34.20",$rootVersion -replace "534.20.8",$nugetVersion > "$basedir/FullROOT.nuspec"
+    $(Get-Content "$scriptDirectory/ROOT.nuget/FullROOT.nuspec") -replace "5.34.20",$rootVersion -replace "534.20",$nugetVersion > "$basedir/FullROOT.nuspec"
     $(Get-Content "$scriptDirectory/ROOT.nuget/ROOT.props") -replace "5.34.20",$rootVersion | set-content "$basedir/ROOT.props"
 	Copy-Item $scriptDirectory/ROOT.nuget/ROOT.targets $basedir/ROOT.targets
 

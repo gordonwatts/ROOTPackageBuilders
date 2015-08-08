@@ -49,6 +49,103 @@ namespace ROOTMSBuildTasks
         public string ROOTSYS { get; private set; }
 
         /// <summary>
+        /// Contains everything we need to perform the download
+        /// </summary>
+        private abstract class DownloadOptions
+        {
+            /// <summary>
+            /// The URL that we will fetch the file from.
+            /// </summary>
+            public string FileNameOnServer;
+
+            /// <summary>
+            /// For handy logging.
+            /// </summary>
+            public TaskLoggingHelper Log;
+
+            /// <summary>
+            /// Download and unpack the file, or make sure it has been done already.
+            /// </summary>
+            /// <param name="ROOTSYS"></param>
+            /// <returns></returns>
+            /// <remarks>
+            /// The assumption is made that ROOT can't be found, so we will download a new tar/gz file if we need to.
+            /// </remarks>
+            internal bool DownloadAndUnpack(string ROOTSYS, string installationPath)
+            {
+                // Get the zip/tar-gz file.
+                var localFile = DownloadFileToLocation(installationPath);
+                if (localFile == null)
+                {
+                    return false;
+                }
+
+                // Next, unpack the downloaded file.
+                Log.LogMessage(MessageImportance.High, "Unpacking ROOT");
+
+                // Make sure 7 zip is there.
+                string sevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
+                if (!File.Exists(sevenZipPath))
+                {
+                    Log.LogError("The 7zip utility to uncompress the ROOT archive must be installed");
+                    return false;
+                }
+
+                Unpack(sevenZipPath, localFile, installationPath);
+
+                // It will be in a directory called "root". We need to rename that.
+                var rootInstallLocation = Path.Combine(installationPath, "root");
+                Directory.Move(rootInstallLocation, ROOTSYS);
+
+                return true;
+            }
+
+            /// <summary>
+            /// Unpack the given file. Use wd as a place to actually execute!
+            /// </summary>
+            /// <param name="sevenZipPath"></param>
+            /// <param name="filepath"></param>
+            /// <param name="wd"></param>
+            /// <returns></returns>
+            protected abstract bool Unpack (string sevenZipPath, string filepath, string wd);
+
+            /// <summary>
+            /// Make sure the compressed file is there.
+            /// </summary>
+            /// <param name="installationPath"></param>
+            /// <returns></returns>
+            private string DownloadFileToLocation(string installationPath)
+            {
+                // Download the file if it hasn't already been.
+                var filePath = Path.Combine(new string[] { installationPath, FileNameOnServer });
+                if (!File.Exists(filePath))
+                {
+                    var url = string.Format("ftp://root.cern.ch/root/{0}", FileNameOnServer);
+
+                    Log.LogMessage(MessageImportance.Low, "Downloading from URL {0} to location {1}", url, filePath);
+                    Log.LogMessage(MessageImportance.High, string.Format("Downloading ROOT ({0})", FileNameOnServer));
+
+                    if (!Directory.Exists(installationPath))
+                    {
+                        Directory.CreateDirectory(installationPath);
+                    }
+
+                    // Do the download
+                    WebClient webClient = new WebClient();
+                    try
+                    {
+                        webClient.DownloadFile(url, filePath);
+                    }
+                    catch (WebException e)
+                    {
+                        return null;
+                    }
+                }
+                return filePath;
+            }
+        }
+
+        /// <summary>
         /// Fetch ROOT, if needed.
         /// </summary>
         /// <returns></returns>
@@ -63,69 +160,115 @@ namespace ROOTMSBuildTasks
                 return true;
             }
 
-            // Build the URL, and then download the file.
-            string url = string.Format("ftp://root.cern.ch/root/root_v{0}.win32.{1}.tar.gz", Version, VCVersion);
-            string filePath = Path.Combine(new string[] { InstallationPath, string.Format("root_v{0}.win32.{1}.tar.gz", Version, VCVersion) });
+            // Try the .zip file first, and if that fails, try the .tar.gz file second.
+            var downloads = new List<DownloadOptions>();
+            downloads.Add(DownloadFromZip());
+            downloads.Add(DownloadFromTarGz());
 
-            if (!File.Exists(filePath))
+            foreach (var d in downloads)
             {
-                // If we are here we are going to have to do the complete download. Log a message first.
-                Log.LogMessage(MessageImportance.Low, "Downloading from URL {0} to location {1}", url, filePath);
-                Log.LogMessage(MessageImportance.High, string.Format("Downloading ROOT v{0}", Version));
-
-                // Create the directory
-                if (!Directory.Exists(InstallationPath))
-                {
-                    Directory.CreateDirectory(InstallationPath);
-                }
-
-                // Do the download
-                WebClient webClient = new WebClient();
-                try
-                {
-                    webClient.DownloadFile(url, filePath);
-                }
-                catch (WebException e)
-                {
-                    throw new InvalidOperationException(string.Format("Failed to download from {0}.", url), e);
-                }
+                d.Log = Log;
             }
 
-            // Next, unpack the downloaded file.
-            Log.LogMessage(MessageImportance.High, string.Format("Unpacking ROOT v{0}", Version));
+            // Do the download. Hopefully someone will get it right.
+            var gotit = downloads
+                .Select(d => d.DownloadAndUnpack(ROOTSYS, InstallationPath))
+                .Where(r => r == true)
+                .FirstOrDefault();
 
-            // Make sure 7 zip is there.
-            string sevenZipPath = @"C:\Program Files\7-Zip\7z.exe";
-            if (!File.Exists(sevenZipPath))
+            // If we fail, then we should let everyone know.
+            if (gotit == null)
             {
-                Log.LogError("The 7zip utility to uncompress the ROOT archive must be installed");
+                var err = new StringBuilder();
+                err.AppendLine("Unable to download ROOT. Tried the following: ");
+                foreach(var d in downloads)
+                {
+                    err.AppendLine("   ftp://root.cern.ch/root/" + d.FileNameOnServer);
+                }
+                Log.LogError(err.ToString());
                 return false;
             }
-
-            // Unpack the gz
-            string uncompressCmdArgs = string.Format("x -y {0}", filePath);
-            if (!ExecuteCommandLine(sevenZipPath, uncompressCmdArgs))
-            {
-                return false;
-            }
-
-            // Unpack the resulting tar file
-            var tarFile = filePath.Replace(".tar.gz", ".tar");
-            uncompressCmdArgs = string.Format("x -y {0}", tarFile);
-            if (!ExecuteCommandLine(sevenZipPath, uncompressCmdArgs))
-            {
-                return false;
-            }
-
-            // It will be in a directory called "root". We need to rename that.
-            var rootInstallLocation = Path.Combine(InstallationPath, "root");
-            Directory.Move(rootInstallLocation, ROOTSYS);
-
-            // Remove the tar file, which can be quite large. We'll leave the gz around so that if something
-            // happens we don't have to re-download things.
-            File.Delete(tarFile);
 
             return true;
+
+        }
+
+        /// <summary>
+        /// Download from a tar/gz location.
+        /// </summary>
+        class DownloadOptionsTarGz : DownloadOptions
+        {
+            /// <summary>
+            /// Unpack a tar/gz file properly
+            /// </summary>
+            /// <param name="sevenZipPath"></param>
+            /// <param name="filepath"></param>
+            /// <returns></returns>
+            protected override bool Unpack(string sevenZipPath, string filePath, string wd)
+            {
+                // Unpack the gz
+                string uncompressCmdArgs = string.Format("x -y {0}", filePath);
+                if (!ExecuteCommandLine(Log, wd, sevenZipPath, uncompressCmdArgs))
+                {
+                    return false;
+                }
+
+                // Unpack the resulting tar file
+                var tarFile = filePath.Replace(".tar.gz", ".tar");
+                uncompressCmdArgs = string.Format("x -y {0}", tarFile);
+                if (!ExecuteCommandLine(Log, wd, sevenZipPath, uncompressCmdArgs))
+                {
+                    return false;
+                }
+
+                // Remove the tar file, which can be quite large. We'll leave the gz around so that if something
+                // happens we don't have to re-download things.
+                File.Delete(tarFile);
+
+                return true;
+            }
+        }
+
+
+        /// <summary>
+        /// Create a download options that will fetch and unpack a tar/gz file.
+        /// </summary>
+        /// <returns></returns>
+        private DownloadOptions DownloadFromTarGz()
+        {
+            return new DownloadOptionsTarGz() {
+                FileNameOnServer = string.Format("root_v{0}.win32.{1}.tar.gz", Version, VCVersion)
+            };
+        }
+
+        /// <summary>
+        /// Deal with a ZIP file style ROOT download
+        /// </summary>
+        class DownloadOptionsZIP : DownloadOptions
+        {
+            protected override bool Unpack(string sevenZipPath, string filepath, string wd)
+            {
+                // Unpack the zip
+                string uncompressCmdArgs = string.Format("x -y {0}", filepath);
+                if (!ExecuteCommandLine(Log, wd, sevenZipPath, uncompressCmdArgs))
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+
+        /// <summary>
+        /// Create a download options that will fetch and download a ZIP file.
+        /// </summary>
+        /// <returns></returns>
+        private DownloadOptions DownloadFromZip()
+        {
+            return new DownloadOptionsZIP()
+            {
+                FileNameOnServer = string.Format("root_v{0}.win32.{1}.zip", Version, VCVersion)
+            };
         }
 
         /// <summary>
@@ -133,11 +276,11 @@ namespace ROOTMSBuildTasks
         /// </summary>
         /// <param name="exePath"></param>
         /// <param name="args"></param>
-        private bool ExecuteCommandLine(string exePath, string args)
+        private static bool ExecuteCommandLine(TaskLoggingHelper Log, string wd, string exePath, string args)
         {
             Log.LogCommandLine(string.Format("{0} {1}", exePath, args));
             var proc = new ProcessStartInfo(exePath, args);
-            proc.WorkingDirectory = InstallationPath;
+            proc.WorkingDirectory = wd;
             proc.UseShellExecute = false;
             proc.CreateNoWindow = true;
             proc.RedirectStandardOutput = true;

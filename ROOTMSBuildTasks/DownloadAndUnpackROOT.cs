@@ -1,6 +1,5 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -107,7 +106,7 @@ namespace ROOTMSBuildTasks
             /// <param name="filepath"></param>
             /// <param name="wd"></param>
             /// <returns></returns>
-            protected abstract bool Unpack (string sevenZipPath, string filepath, string wd);
+            protected abstract bool Unpack(string sevenZipPath, string filepath, string wd);
 
             /// <summary>
             /// Make sure the compressed file is there.
@@ -136,7 +135,7 @@ namespace ROOTMSBuildTasks
                     {
                         webClient.DownloadFile(url, filePath);
                     }
-                    catch (WebException e)
+                    catch (WebException)
                     {
                         return null;
                     }
@@ -152,7 +151,7 @@ namespace ROOTMSBuildTasks
         public override bool Execute()
         {
             // Setup the expected output directory
-            ROOTSYS = Path.Combine(new string[]{InstallationPath, string.Format("root-{0}-{1}", Version, VCVersion)});
+            ROOTSYS = Path.Combine(new string[] { InstallationPath, string.Format("root-{0}-{1}", Version, VCVersion) });
 
             // If it exists, then we have nothing to do!
             if (Directory.Exists(ROOTSYS))
@@ -177,11 +176,11 @@ namespace ROOTMSBuildTasks
                 .FirstOrDefault();
 
             // If we fail, then we should let everyone know.
-            if (gotit == null)
+            if (!gotit)
             {
                 var err = new StringBuilder();
                 err.AppendLine("Unable to download ROOT. Tried the following: ");
-                foreach(var d in downloads)
+                foreach (var d in downloads)
                 {
                     err.AppendLine("   ftp://root.cern.ch/root/" + d.FileNameOnServer);
                 }
@@ -236,7 +235,8 @@ namespace ROOTMSBuildTasks
         /// <returns></returns>
         private DownloadOptions DownloadFromTarGz()
         {
-            return new DownloadOptionsTarGz() {
+            return new DownloadOptionsTarGz()
+            {
                 FileNameOnServer = string.Format("root_v{0}.win32.{1}.tar.gz", Version, VCVersion)
             };
         }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Polly;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -78,6 +80,7 @@ namespace ROOTMSBuildTasks
                 {
                     return false;
                 }
+                Log.LogMessage(MessageImportance.Low, string.Format("Downloaded ROOT to {0}", localFile));
 
                 // Next, unpack the downloaded file.
                 Log.LogMessage(MessageImportance.High, "Unpacking ROOT");
@@ -89,6 +92,7 @@ namespace ROOTMSBuildTasks
                     Log.LogError("The 7zip utility to uncompress the ROOT archive must be installed");
                     return false;
                 }
+                Log.LogMessage(MessageImportance.Low, "Path to 7zip is " + sevenZipPath);
 
                 Unpack(sevenZipPath, localFile, installationPath);
 
@@ -135,10 +139,16 @@ namespace ROOTMSBuildTasks
                     {
                         webClient.DownloadFile(url, filePath);
                     }
-                    catch (WebException)
+                    catch (WebException e)
                     {
+                        Log.LogMessage(MessageImportance.Low, string.Format("Error downloading {0}: {1}", url, e.Message));
                         return null;
                     }
+                    Log.LogMessage(MessageImportance.Low, "Done downloading ROOT");
+                }
+                else
+                {
+                    Log.LogMessage(MessageImportance.Low, "Root has already been downloaded to " + filePath);
                 }
                 return filePath;
             }
@@ -150,42 +160,60 @@ namespace ROOTMSBuildTasks
         /// <returns></returns>
         public override bool Execute()
         {
-            // Setup the expected output directory
-            ROOTSYS = Path.Combine(new string[] { InstallationPath, string.Format("root-{0}-{1}", Version, VCVersion) });
+            // Check to see a lock file exists. If so, then we need to just hold off.
+            // The reason is: ROOTSYS might have been created, and it is still being unpacked.
+            var lockFile = new FileInfo(Path.Combine(InstallationPath, string.Format("{0}-{1}.lock", Version, VCVersion)));
+            var fs = Policy
+                .Handle<IOException>()
+                .WaitAndRetry(5 * 60 / 10 + 20, retryCount => retryCount < 20 ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromSeconds(10), (e, time) => Log.LogMessage(MessageImportance.Normal, "Waiting for ROOT to be downloaded..." + time.ToString()))
+                .Execute(() => lockFile.Create());
 
-            // If it exists, then we have nothing to do!
-            if (Directory.Exists(ROOTSYS))
+            try
             {
-                return true;
-            }
 
-            // Try the .zip file first, and if that fails, try the .tar.gz file second.
-            var downloads = new List<DownloadOptions>();
-            downloads.Add(DownloadFromZip());
-            downloads.Add(DownloadFromTarGz());
+                // Setup the expected output directory
+                ROOTSYS = Path.Combine(new string[] { InstallationPath, string.Format("root-{0}-{1}", Version, VCVersion) });
 
-            foreach (var d in downloads)
-            {
-                d.Log = Log;
-            }
+                // If it exists, then we have nothing to do!
+                if (Directory.Exists(ROOTSYS))
+                {
+                    return true;
+                }
 
-            // Do the download. Hopefully someone will get it right.
-            var gotit = downloads
-                .Select(d => d.DownloadAndUnpack(ROOTSYS, InstallationPath))
-                .Where(r => r == true)
-                .FirstOrDefault();
+                // Try the .zip file first, and if that fails, try the .tar.gz file second.
+                var downloads = new List<DownloadOptions>();
+                downloads.Add(DownloadFromZip());
+                downloads.Add(DownloadFromTarGz());
 
-            // If we fail, then we should let everyone know.
-            if (!gotit)
-            {
-                var err = new StringBuilder();
-                err.AppendLine("Unable to download ROOT. Tried the following: ");
                 foreach (var d in downloads)
                 {
-                    err.AppendLine("   ftp://root.cern.ch/root/" + d.FileNameOnServer);
+                    d.Log = Log;
                 }
-                Log.LogError(err.ToString());
-                return false;
+
+                // Do the download. Hopefully someone will get it right.
+                var gotit = downloads
+                    .Select(d => d.DownloadAndUnpack(ROOTSYS, InstallationPath))
+                    .Where(r => r == true)
+                    .FirstOrDefault();
+
+                // If we fail, then we should let everyone know.
+                if (!gotit)
+                {
+                    var err = new StringBuilder();
+                    err.AppendLine("Unable to download ROOT. Tried the following: ");
+                    foreach (var d in downloads)
+                    {
+                        err.AppendLine("   ftp://root.cern.ch/root/" + d.FileNameOnServer);
+                    }
+                    Log.LogError(err.ToString());
+                    return false;
+                }
+            }
+            finally
+            {
+                fs.Close();
+                fs.Dispose();
+                lockFile.Delete();
             }
 
             return true;

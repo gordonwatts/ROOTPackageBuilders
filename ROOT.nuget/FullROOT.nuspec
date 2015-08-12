@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ROOT</id>
-    <version>534.20.9</version>
+    <version>534.20.10</version>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <owners>G. Watts</owners>
     <authors>The ROOT Team @ CERN</authors>
@@ -12,7 +12,7 @@
     <tags>Data Analysis C++ ROOT TTree TH1 nativepackage</tags>
     <summary>Native package to build against the ROOT libraries.</summary>
     <licenseUrl>http://root.cern.ch/drupal/content/license</licenseUrl>
-    <releaseNotes>Version 5.34.20 of root.</releaseNotes>
+    <releaseNotes>Version 5.34.20 of root. Fix issues with multiple-project building races.</releaseNotes>
     <projectUrl>https://github.com/gordonwatts/ROOTPackageBuilders/</projectUrl>
     <copyright />
   </metadata>
@@ -20,5 +20,6 @@
 	<file src="ROOT.targets" target="/build/native/ROOT.targets" />
 	<file src="ROOT.props" target="/build/native/ROOT.props" />
 	<file src="..\ROOTMSBuildTasks\bin\Release\ROOTMSBuildTasks.dll" target="/build/native/ROOTMSBuildTasks.dll" />
+	<file src="..\ROOTMSBuildTasks\bin\Release\Polly.dll" target="/build/native/Polly.dll" />
   </files>
 </package>

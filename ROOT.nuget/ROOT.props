@@ -3,31 +3,4 @@
 	<PropertyGroup>
 		<ROOTVersion>5.34.20</ROOTVersion>
 	</PropertyGroup>
-
-	<PropertyGroup Condition="!Exists($(TEMP))">
-		<ROOTStorageDir>$(SolutionDir)\root</ROOTStorageDir>
-	</PropertyGroup>
-	<PropertyGroup Condition="Exists($(TEMP))">
-		<ROOTStorageDir>$(TEMP)\root</ROOTStorageDir>
-	</PropertyGroup>
-	<PropertyGroup>
-		<ROOTMachineDir>$(ROOTStorageDir)/root-$(ROOTVersion)-vc11</ROOTMachineDir>
-	</PropertyGroup>
-
-	<!--If the local download exists or no ROOTSYS is defined, then default to the local download. -->
-	<PropertyGroup Condition="Exists($(ROOTMachineDir)) Or '$(ROOTSYS)' == ''">
-		<ROOTSYS Condition="Exists('c:\root')" >c:\root</ROOTSYS>
-		<ROOTSYS Condition="!Exists('c:\root')">$(ROOTMachineDir)</ROOTSYS>
-	</PropertyGroup>
-
-	<!--Now configure the actual build.-->
-	<ItemDefinitionGroup>
-		<Link>
-			<AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
-		</Link>
-		<ClCompile>
-			<ForcedIncludeFiles>w32pragma.h</ForcedIncludeFiles>
-			<AdditionalIncludeDirectories>$(ROOTSYS)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-		</ClCompile>
-	</ItemDefinitionGroup>
 </Project>

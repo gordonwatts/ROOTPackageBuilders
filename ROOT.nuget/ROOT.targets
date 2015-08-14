@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!-- Basic property definitions -->
+	<PropertyGroup>
+		<ROOTVCVersion Condition="$(PlatformToolset) == v110">vc11</ROOTVCVersion>
+		<ROOTVCVersion Condition="$(PlatformToolset) == v120">vc12</ROOTVCVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="!Exists($(TEMP))">
+		<ROOTStorageDir>$(SolutionDir)\root</ROOTStorageDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="Exists($(TEMP))">
+		<ROOTStorageDir>$(TEMP)\root</ROOTStorageDir>
+	</PropertyGroup>
+	<PropertyGroup>
+		<ROOTMachineDir>$(ROOTStorageDir)/root-$(ROOTVersion)-$(ROOTVCVersion)</ROOTMachineDir>
+	</PropertyGroup>
+
+	<!--If the local download exists or no ROOTSYS is defined, then default to the local download. -->
+	<PropertyGroup Condition="Exists($(ROOTMachineDir)) Or '$(ROOTSYS)' == ''">
+		<ROOTSYS Condition="Exists('c:\root')" >c:\root</ROOTSYS>
+		<ROOTSYS Condition="!Exists('c:\root')">$(ROOTMachineDir)</ROOTSYS>
+	</PropertyGroup>
+
+	<!--Now configure the actual build.-->
+	<ItemDefinitionGroup>
+		<Link>
+			<AdditionalDependencies>$(ROOTSYS)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<ClCompile>
+			<ForcedIncludeFiles>w32pragma.h</ForcedIncludeFiles>
+			<AdditionalIncludeDirectories>$(ROOTSYS)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ClCompile>
+	</ItemDefinitionGroup>
+
 	<!-- The ROOT Build tasks -->
 	<UsingTask TaskName="GetInstalledROOTVersion" AssemblyFile="ROOTMSBuildTasks.dll"/>
 	<UsingTask TaskName="DownloadAndUnpackROOT" AssemblyFile="ROOTMSBuildTasks.dll" />
@@ -9,7 +42,7 @@
 	<Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
 		<Message Text="ROOTSYS at FindInstalled is $(ROOTSYS)" />
 		<Error Text="ROOT supports builds against the DLL Release version of the C++ runtime library. Either use the Release build, or Debug build with the C++ option Code Generation->RunTimeLibrary set correctly (along with the proper preprocessor macros for the STL)" Condition="%(ClCompile.RuntimeLibrary) != MultiThreadedDll" />
-		<Error Text="This ROOT package supports only Visual Studio 2012. Please make sure the platform toolset is set to the 2012 (v110) toolset in the property General dialog." Condition="$(PlatformToolset) != v110"/>
+		<Error Text="This ROOT package supports only Visual Studio 2012. Please make sure the platform toolset is set to the 2012 (v110) toolset in the property General dialog." Condition="($(PlatformToolset) != v110) and ($(PlatformToolset) != v120)"/>
 		<GetInstalledROOTVersion Condition="!Exists($(ROOTMachineDir))">
 			<Output TaskParameter="Version"  PropertyName="ROOTInstalledVersion"/>
 			<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath" />
@@ -18,7 +51,7 @@
 
 	<!--Download a version of root if we need it-->
 	<Target Name="DownloadAndUnpack" AfterTargets="FindInstalledROOTVersion" Condition="!Exists($(ROOTMachineDir)) And $(ROOTInstalledVersion) != $(ROOTVersion)">
-		<DownloadAndUnpackROOT Version="$(ROOTVersion)" InstallationPath="$(ROOTStorageDir)" VCVersion="vc11">
+		<DownloadAndUnpackROOT Version="$(ROOTVersion)" InstallationPath="$(ROOTStorageDir)" VCVersion="$(ROOTVCVersion)">
 			<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath"/>
 		</DownloadAndUnpackROOT>
 		<PropertyGroup>

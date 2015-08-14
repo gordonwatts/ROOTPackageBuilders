@@ -2,17 +2,17 @@
 <package>
   <metadata>
     <id>ROOT</id>
-    <version>534.20.10</version>
+    <version>534.20.11</version>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <owners>G. Watts</owners>
     <authors>The ROOT Team @ CERN</authors>
     <iconUrl>http://root.cern.ch/drupal/sites/all/themes/newsflash/images/blue/root6-banner.png</iconUrl>
-    <description>Enables C++ programs to link against ROOT libraries. This package requires that VS2012 is being used. Only release mode, multithreaded DLL's are supported. See the main ROOT website for complete documentation: http://root.cern.ch</description>
+    <description>Enables C++ programs to link against ROOT libraries. This package requires that compilers for VS2012 or VS2013 are being installed. Only release mode, multithreaded DLL's are supported. See the main ROOT website for complete documentation: http://root.cern.ch</description>
     <title>ROOT</title>
     <tags>Data Analysis C++ ROOT TTree TH1 nativepackage</tags>
     <summary>Native package to build against the ROOT libraries.</summary>
     <licenseUrl>http://root.cern.ch/drupal/content/license</licenseUrl>
-    <releaseNotes>Version 5.34.20 of root. Fix issues with multiple-project building races.</releaseNotes>
+    <releaseNotes>Version 5.34.20 of root. Allow VS2013 use.</releaseNotes>
     <projectUrl>https://github.com/gordonwatts/ROOTPackageBuilders/</projectUrl>
     <copyright />
   </metadata>

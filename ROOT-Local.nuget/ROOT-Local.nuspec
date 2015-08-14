@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>ROOT-Local</id>
+    <version>1.0</version>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <owners>G. Watts</owners>
+    <authors>The ROOT Team @ CERN</authors>
+    <iconUrl>http://root.cern.ch/drupal/sites/all/themes/newsflash/images/blue/root6-banner.png</iconUrl>
+    <description>Enables C++ programs to link against ROOT libraries. The ROOT libraries are expected to have been installed in the standard c:\root location previously by you! Make sure you install VS2012 or VS2013 properly! See the main ROOT website for complete documentation: http://root.cern.ch</description>
+    <title>ROOT-Local</title>
+    <tags>Data Analysis C++ ROOT TTree TH1 nativepackage</tags>
+    <summary>Native package to build against locally installed ROOT libraries.</summary>
+    <licenseUrl>http://root.cern.ch/drupal/content/license</licenseUrl>
+    <releaseNotes>Build against local install. Including warnings if unsupported build.</releaseNotes>
+    <projectUrl>https://github.com/gordonwatts/ROOTPackageBuilders/</projectUrl>
+    <copyright />
+  </metadata>
+  <files>
+	<file src="ROOT.targets" target="/build/native/ROOT-Local.targets" />
+  </files>
+</package>

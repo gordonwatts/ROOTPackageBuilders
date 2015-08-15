@@ -19,6 +19,7 @@ Using The Packages in your C++ Builds
 6. To get intellisense working, either restart Visual Studio, or select "Rescan Project" from the "Project" menu after first build.
 
 ROOT: https://www.nuget.org/packages/ROOT/
+
 ROOT-Local: https://www.nuget.org/packages/ROOT-Local/
 
 Using the Packages: Fine Print

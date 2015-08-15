@@ -9,7 +9,7 @@ It has some nice features - for example, failing with a nice error message if yo
 Using The Packages in your C++ Builds
 --------------
 
-1. Create a C++ program
+1. Create a C++ project (e.g. a win32 console app)
 2. Right click on the program, and select "Manage NuGet packages"
 3. Enter either "ROOT" or "ROOT-Local" in the search box when the "Online" nuget.org repo is selected.
    -   ROOT: Use this to build against a specific version of ROOT. If the version isn't on your machine, it will be downloaded during the build. Robot (e.g. Jenkins) friendly.
@@ -17,6 +17,9 @@ Using The Packages in your C++ Builds
 4. Install the former if you want a specific version of root, and want it downloaded. Or the latter if you want to build against whatever is on your machine.
 5. Build.
 6. To get intellisense working, either restart Visual Studio, or select "Rescan Project" from the "Project" menu after first build.
+
+ROOT: https://www.nuget.org/packages/ROOT/
+ROOT-Local: https://www.nuget.org/packages/ROOT-Local/
 
 Using the Packages: Fine Print
 ------------
@@ -44,11 +47,13 @@ to help you around some common problems:
   but the IDE only scans this file when you first open the solution. So you might have to close and re-open the solution the
   first time you do this. The symptom: your program can't load because it is missing some DLL. There isn't (as far as I know) a
   way around this.
+- Running with VS2015 installed should work, as long as you first install the VS2013 libraries (get them from the Windows SDK,
+  should be free), and then make sure your projects are setup to build using those compilers. Sadly, this means you can't
+  take advantage of all the compiler improvements.
 
 Developer Instructions
 ------------
 
-New:
 1. Make sure to build the ROOTMSBuildTasks in release mode.
 2. Start powershell
 3. import-module ROOTNuGetPackageBUildser.psm1

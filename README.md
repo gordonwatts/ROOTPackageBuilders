@@ -3,39 +3,60 @@ ROOTPackageBuilders
 
 Scripts and code to build the ROOT nuget packages (and ROOT.NET packages).
 
-The ROOT nuget pacakge () allows "easier" building against the C++ ROOT libraries in a C++ project.
+The ROOT nuget pacakge (ROOT and ROOT-Local) allows "easier" building against the C++ ROOT libraries in a C++ project.
 It has some nice features - for example, failing with a nice error message if you build an incompatible configuration (e.g. debug).
 
-Using the ROOT NuGet Package
+Using The Packages in your C++ Builds
+--------------
+
+1. Create a C++ program
+2. Right click on the program, and select "Manage NuGet packages"
+3. Enter either "ROOT" or "ROOT-Local" in the search box when the "Online" nuget.org repo is selected.
+   -   ROOT: Use this to build against a specific version of ROOT. If the version isn't on your machine, it will be downloaded during the build. Robot (e.g. Jenkins) friendly.
+   -   ROOT-Local: Use this to build against whatever you have installed on your machine.
+4. Install the former if you want a specific version of root, and want it downloaded. Or the latter if you want to build against whatever is on your machine.
+5. Build.
+6. To get intellisense working, either restart Visual Studio, or select "Rescan Project" from the "Project" menu after first build.
+
+Using the Packages: Fine Print
 ------------
 
-Usage is a little more complex than a normal nuget package because ROOT is an installation, not a set of libraries:
+No surprise here, it is possible to get yourself into trouble using ROOT. Please read through these caveats
+to help you around some common problems:
 
-1. Install the ROOT library from nuget as you would any other nuget package in your C++ application.
-2. Build
-   - If you have the same version of ROOT already installed on your computer, everything will just work.
-   - If you don't, the first time you build ROOT will be downloaded from the net. Your computer's environment
-     will not be altered. ROOT is a large download. This step may take some time!!
-
-Getting Intellisense working (if it isn't by default):
-
-- Select the project you have just built (you must have built at least once), and select "Rescan Project" from the Project menu.
-It takes the IDE a minute or so, but it should start working.
-
-Running:
-
-- The build will modify the .user file for your project to set the environment variables that ROOT needs to run properly.
-- To get the IDE to recognize them you must close and re-open the solution (or restart the IDE).
-
-Unfortunately, I've found no way around this feature. :(
+- ROOT v5 is build only for VS2010, VS2012, and VS2013. These nuget packages only support VS2012 and VS2013 compilers!! If
+  you try to use something else you'll get errors. ROOT v6 is not available on windows at the time of this writing.
+- ROOT on windows is distributed linked against the optimized DLL version of the standard libraries. This is viral: all of your
+  projects must be built the same way. If the compiler options look wrong, you will get a build failure.
+- To debug your code, I recommend deleting the Debug configuration, creating a copy of the Release configuration and then
+  turning off optimization, and turn on writing out a debug database.
+- If you use ACLiC in your ROOT program, make sure that the VC environment variables, etc., are defined in a shell and then start
+  devenv. By default, devenv doesn't clutter your program's environment with all those extra defines, and thus ROOT can't find
+  the compiler!
+- ROOT-Local can't automatically figure out what you have installed (VS2012 or VS2013 version of ROOT). Make sure they match,
+  or you will get some weird and unexpected crashes. See issue #18 on github!
+- The ROOT nuget package will download ROOT the first time it builds if it isn't installed locally. So you'll need an internet
+  connection. And the first time it might take a while!! By default it  stashes it in c:\users\<user>\AppData\Local\Temp\root.
+  Delete at anytime, and on the next build it will re-download. Or install it in c:\root, and it will automatically pick it up
+  there if it wasn't downloaded.
+- After selecting "Rescan Project", give the IDE a minute or so to scan and find all the ROOT files.
+- Using the ROOT nuget package, when you run, you have to make sure ROOT is in your PATH. The package will do this for you,
+  but the IDE only scans this file when you first open the solution. So you might have to close and re-open the solution the
+  first time you do this. The symptom: your program can't load because it is missing some DLL. There isn't (as far as I know) a
+  way around this.
 
 Developer Instructions
 ------------
 
 New:
 1. Make sure to build the ROOTMSBuildTasks in release mode.
-2. Run nuget on the nuspec file found in ROOT.nuget directory
-3. Publish the file.
+2. Start powershell
+3. import-module ROOTNuGetPackageBUildser.psm1
+4. New-ROOTNugetPackage 5.34.32 534.32
+5. nuget push ROOT.534.32.11.nupkg
+
+Note the nuget version number is a compressed version. This is because semantic versioning only allows for three version numbers,
+and we are using the last one for the nuget packaging.
 
 Scenarios
 ---------
@@ -54,17 +75,3 @@ Easiest way to check is right-click on a ROOT include file, open it, and then mo
 
 In cases 1, 2, and 3 there should be a .bat file that contains the proper definition of the ROOTSYS variable and modification to PATH.
 If 10 projects are built at once, they should not fail because of multiple writes to that file.
-
-Waiting for the next step:
---------------
-Ignore everything here for now.
-
-Old:
-Things to do one time:
-
-Set-ExecutionPolicy RemoteSigned
-Install CoApp (http://coapp.org/pages/releases.html) Make sure to follow instructions found in the tutorial: http://coapp.org/tutorials/installation.html - or it won't work until you reboot! :-)
-
-Then from a ps prompt:
-PackageROOTForNuget.ps1 ftp://root.cern.ch/root/root_v5.34.18.win32.vc11.tar.gz 1 $env:TEMP/root
-

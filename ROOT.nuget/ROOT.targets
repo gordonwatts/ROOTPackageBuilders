@@ -42,7 +42,7 @@
 	<Target Name="FindInstalledROOTVersion" AfterTargets="PrepareForBuild">
 		<Message Text="ROOTSYS at FindInstalled is $(ROOTSYS)" />
 		<Error Text="ROOT supports builds against the DLL Release version of the C++ runtime library. Either use the Release build, or Debug build with the C++ option Code Generation->RunTimeLibrary set correctly (along with the proper preprocessor macros for the STL)" Condition="%(ClCompile.RuntimeLibrary) != MultiThreadedDll" />
-		<Error Text="This ROOT package supports only Visual Studio 2012. Please make sure the platform toolset is set to the 2012 (v110) toolset in the property General dialog." Condition="($(PlatformToolset) != v110) and ($(PlatformToolset) != v120)"/>
+		<Error Text="This ROOT package supports only Visual Studio 2012 or Visual Studio 2013. Please make sure the platform toolset is set to the 2012 (v110) or 2013 (v120) toolset in the property General dialog." Condition="($(PlatformToolset) != v110) and ($(PlatformToolset) != v120)"/>
 		<GetInstalledROOTVersion Condition="!Exists($(ROOTMachineDir))">
 			<Output TaskParameter="Version"  PropertyName="ROOTInstalledVersion"/>
 			<Output TaskParameter="ROOTSYS" PropertyName="ROOTSYSPath" />

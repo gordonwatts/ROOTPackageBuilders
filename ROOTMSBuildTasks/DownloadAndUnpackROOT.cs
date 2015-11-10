@@ -161,8 +161,14 @@ namespace ROOTMSBuildTasks
         public override bool Execute()
         {
             // Check to see a lock file exists. If so, then we need to just hold off.
-            // The reason is: ROOTSYS might have been created, and it is still being unpacked.
+            // The reason is: ROOTSYS might have been created, and it is still being unpacked. And we are going to have to
+            // hold off for a while, as the download can take quite some time.
             var lockFile = new FileInfo(Path.Combine(InstallationPath, string.Format("{0}-{1}.lock", Version, VCVersion)));
+            if (!lockFile.Directory.Exists)
+            {
+                lockFile.Directory.Create();
+            }
+
             var fs = Policy
                 .Handle<IOException>()
                 .WaitAndRetry(5 * 60 / 10 + 20, retryCount => retryCount < 20 ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromSeconds(10), (e, time) => Log.LogMessage(MessageImportance.Normal, "Waiting for ROOT to be downloaded..." + time.ToString()))

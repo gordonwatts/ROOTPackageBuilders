@@ -115,7 +115,10 @@ namespace ROOTMSBuildTasks.Test
             {
                 tempDir.Delete(true);
             }
-            tempDir.Create();
+
+            // In normal running the directory isn't created first, so make sure we can deal with the fact
+            // that it isn't there!!
+            //tempDir.Create();
 
             var d = new DownloadAndUnpackROOT();
             d.BuildEngine = new dummyBuildEngine();
@@ -137,7 +140,7 @@ namespace ROOTMSBuildTasks.Test
             {
                 tempDir.Delete(true);
             }
-            tempDir.Create();
+            //tempDir.Create();
 
             var d = new DownloadAndUnpackROOT();
             d.BuildEngine = new dummyBuildEngine();

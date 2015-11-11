@@ -52,8 +52,28 @@ to help you around some common problems:
   should be free), and then make sure your projects are setup to build using those compilers. Sadly, this means you can't
   take advantage of all the compiler improvements.
 
+Getting your machine ready to do ROOT development
+=================================================
+
+I recommend setting your machine up as follows. This can be done using just the free tools from Microsoft and will get you a full
+development environment.
+
+1. Download and install Visual Studio Express 2013 for C++ (https://www.microsoft.com/en-us/download/details.aspx?id=44914).
+2. Start VS 2013 express and make sure to install any updates (look in Tools -> Extensions). At the very least there is an update to the compiler (Update 5).
+3. Download and install Visaul Studio 2015 Community Edition (https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx).
+4. Start VS 2015 and install any extra updates waiting.
+5. Start VS 2015, create a C++ project, right click on the project, select properties, and in the general page select the 2013 toolset.
+
+You may actually be able to skip VS2015 install, but I've not tested the nuget integration with VS2013. If you do try it out and can avoid 2015,
+let me know.
+
+At some point the ROOT team will release a build of root that works with 2015. I will update these pages when that happens, though feel
+free to enter an issue on github if I don't seem to be moving fast enough! (https://github.com/gordonwatts/ROOTPackageBuilders/issues)
+
 Developer Instructions
-------------
+======================
+
+Instructions for building a new version of this package:
 
 1. Make sure to build the ROOTMSBuildTasks in release mode.
 2. Start powershell

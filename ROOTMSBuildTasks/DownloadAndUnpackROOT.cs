@@ -170,7 +170,7 @@ namespace ROOTMSBuildTasks
             }
 
             var fs = Policy
-                .Handle<IOException>()
+                .Handle<IOException>(exp => exp.Message.Contains("The process cannot access the file"))
                 .WaitAndRetry(5 * 60 / 10 + 20, retryCount => retryCount < 20 ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromSeconds(10), (e, time) => Log.LogMessage(MessageImportance.Normal, "Waiting for ROOT to be downloaded..." + time.ToString()))
                 .Execute(() => lockFile.Create());
 

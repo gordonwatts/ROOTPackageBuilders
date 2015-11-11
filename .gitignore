@@ -218,3 +218,6 @@ pip-log.txt
 .mr.developer.cfg
 *.nupkg
 *.exe
+
+# ROOT Stuff
+5.*/

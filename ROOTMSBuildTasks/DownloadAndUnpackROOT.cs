@@ -123,7 +123,7 @@ namespace ROOTMSBuildTasks
                 var filePath = Path.Combine(new string[] { installationPath, FileNameOnServer });
                 if (!File.Exists(filePath))
                 {
-                    var url = string.Format("ftp://root.cern.ch/root/{0}", FileNameOnServer);
+                    var url = string.Format("https://root.cern.ch/download/{0}", FileNameOnServer);
 
                     Log.LogMessage(MessageImportance.Low, "Downloading from URL {0} to location {1}", url, filePath);
                     Log.LogMessage(MessageImportance.High, string.Format("Downloading ROOT ({0})", FileNameOnServer));
@@ -209,7 +209,7 @@ namespace ROOTMSBuildTasks
                     err.AppendLine("Unable to download ROOT. Tried the following: ");
                     foreach (var d in downloads)
                     {
-                        err.AppendLine("   ftp://root.cern.ch/root/" + d.FileNameOnServer);
+                        err.AppendLine("   https://root.cern.ch/download/" + d.FileNameOnServer);
                     }
                     Log.LogError(err.ToString());
                     return false;

@@ -29,7 +29,7 @@ No surprise here, it is possible to get yourself into trouble using ROOT. Please
 to help you around some common problems:
 
 - ROOT v5 is build only for VS2010, VS2012, and VS2013. These nuget packages only support VS2012 and VS2013 compilers!! If
-  you try to use something else you'll get errors. ROOT v6 is not available on windows at the time of this writing.
+  you try to use something else you'll get errors. ROOT v6 is not currently available for Windows.
 - ROOT on windows is distributed linked against the optimized DLL version of the standard libraries. This is viral: all of your
   projects must be built the same way. If the compiler options look wrong, you will get a build failure.
 - To debug your code, I recommend deleting the Debug configuration, creating a copy of the Release configuration and then
